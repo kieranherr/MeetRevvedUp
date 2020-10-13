@@ -12,12 +12,12 @@ namespace Meet.Models
     {
         [Key]
         public int GarageId { get; set; }
-
-        [ForeignKey("ClientId")]
+        [ForeignKey("Client")]
+        public int ClientId { get; set; }
         public Client Client { get; set; }
 
-        [ForeignKey("CarId")]
-        public Car Car { get; set; }
+        [ForeignKey("Car")]
+        public List<Car> Car { get; set; }
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }

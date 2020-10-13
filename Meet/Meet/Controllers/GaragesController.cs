@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Meet.Data;
 using Meet.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Meet.Controllers
 {
+    [Authorize(Roles = "Car Guy")]
     public class GaragesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,31 +26,32 @@ namespace Meet.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var garage = _context.Garages.Where(g => g.IdentityUserId == userId).FirstOrDefault();
+            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
             if(garage == null)
             {
                 return RedirectToAction("Create");
             }
-            var applicationDbContext = _context.Garages.Include(g => g.IdentityUserId);
-                return View(await applicationDbContext.ToListAsync());
+                return View("Details", garage);
         }
 
         // GET: Garages/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(Garage garage)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            return View(garage.Car.ToList<Car>());
+            //if (id == null)
+            //{
+            //    return NotFound();
+            //}
 
-            var garage = await _context.Garages
-                .FirstOrDefaultAsync(m => m.GarageId == id);
-            if (garage == null)
-            {
-                return NotFound();
-            }
+            //var garage = await _context.Garages
+            //    .FirstOrDefaultAsync(m => m.GarageId == id);
+            //if (garage == null)
+            //{
+            //    return NotFound();
+            //}
 
-            return View(garage);
+            //return View(garage);
         }
 
         // GET: Garages/Create

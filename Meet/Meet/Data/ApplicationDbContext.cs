@@ -24,11 +24,11 @@ namespace Meet.Data
             base.OnModelCreating(builder);
             builder.Entity<IdentityRole>()
             .HasData(
-            new IdentityRole
-            {
-                Name = "Admin",
-                NormalizedName = "ADMIN"
-            }
+           new IdentityRole
+           {
+               Name = "Car Guy",
+               NormalizedName = "CARGUY"
+           }
             );
         }
     }

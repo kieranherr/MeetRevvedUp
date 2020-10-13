@@ -1,19 +1,72 @@
-﻿@model Meet.Models.Garage
+﻿@model IEnumerable<Meet.Models.Car>
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<h1>Index</h1>
 
-<div>
-    <h4>Garage</h4>
-    <hr />
-    <dl class="row">
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.GarageId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Vin)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Make)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Model)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Year)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mileage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mods)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AvgRating)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Vin)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Make)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Model)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Year)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mileage)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Mods)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AvgRating)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-controller="Cars">Edit</a> |
+                <a asp-action="Details" asp-controller="Cars">Details</a> |
+                <a asp-action="Delete" asp-controller="Cars">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

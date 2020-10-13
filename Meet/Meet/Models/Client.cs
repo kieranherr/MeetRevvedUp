@@ -18,6 +18,7 @@ namespace Meet.Models
         public int Age { get; set; }
         public string City { get; set; }
         public List<Client> Friends { get; set; }
+      
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }

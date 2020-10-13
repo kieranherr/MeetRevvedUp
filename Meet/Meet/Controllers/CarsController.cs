@@ -8,9 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using Meet.Data;
 using Meet.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Meet.Controllers
 {
+    [Authorize(Roles = "Car Guy")]
     public class CarsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,13 +27,15 @@ namespace Meet.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var car = _context.Cars.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-            if (car == null)
+            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
+            List<Car> cars = garage.Car.ToList();
+            if (client == null)
             {
-                return RedirectToAction("Create");
+                return RedirectToAction
             }
-            var applicationDbContext = _context.Cars.Include(c => c.IdentityUserId);
-            return View(await applicationDbContext.ToListAsync());
+           
+            return View(cars);
         }
 
         // GET: Cars/Details/5
@@ -51,6 +56,30 @@ namespace Meet.Controllers
             return View(car);
         }
 
+        // GET: Clients/Create
+        public IActionResult CreateClient()
+        {
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
+            return View();
+        }
+
+        // POST: Clients/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateClient([Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City")] Client client)
+        {
+            if (ModelState.IsValid)
+            {
+
+                _context.Add(client);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", client.IdentityUserId);
+            return View(client);
+        }
         // GET: Cars/Create
         public IActionResult Create()
         {

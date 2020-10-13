@@ -18,7 +18,7 @@ namespace Meet.Models
         public int Year { get; set; }
         public int Mileage { get; set; }
         public string Mods { get; set; }
-        public int AvgRating { get; set; }
+        public int AvgRating { get; set; } 
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }
