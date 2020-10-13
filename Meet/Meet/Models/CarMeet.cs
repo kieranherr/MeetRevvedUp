@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Meet.Models
 {
-    public class Meet
+    public class CarMeet
     {
-        [Key]
+        [Key  ]
         public int MeetId { get; set; }
         public string MeetName { get; set; }
         public double Lat { get; set; }
@@ -21,6 +22,9 @@ namespace Meet.Models
         public string MeetTime { get; set; }
         public string MeetDate { get; set; }
         [ForeignKey("CarId")]
-        public Car Car { get; set; } 
+        public Car Car { get; set; }
+        [ForeignKey("IdentityUser")]
+        public string IdentityUserId { get; set; }
+        public IdentityUser IdentityUser { get; set; }
     }
 }
