@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Meet.Controllers
 {
-    [Authorize(Roles = "Car Guy")]
+    [Authorize(Roles = "CarGuy")]
     public class GaragesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -32,26 +32,14 @@ namespace Meet.Controllers
             {
                 return RedirectToAction("Create");
             }
-                return View("Details", garage);
+                return View("Details", client);
         }
 
         // GET: Garages/Details/5
-        public async Task<IActionResult> Details(Garage garage)
+        public async Task<IActionResult> Details()
         {
-            return View(garage.Car.ToList<Car>());
-            //if (id == null)
-            //{
-            //    return NotFound();
-            //}
 
-            //var garage = await _context.Garages
-            //    .FirstOrDefaultAsync(m => m.GarageId == id);
-            //if (garage == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //return View(garage);
+            return View();
         }
 
         // GET: Garages/Create
@@ -69,6 +57,10 @@ namespace Meet.Controllers
         {
             if (ModelState.IsValid)
             {
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+                garage.ClientId = client.ClientId;
+                garage.IdentityUserId = userId;
                 _context.Add(garage);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

@@ -26,7 +26,7 @@ namespace Meet.Data
             .HasData(
            new IdentityRole
            {
-               Name = "Car Guy",
+               Name = "CarGuy",
                NormalizedName = "CARGUY"
            }
             );

@@ -287,7 +287,7 @@ namespace Meet.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "a066e5d7-70d5-4473-ba42-e79bbf871a74", "ae9d52e1-fde9-4b54-a6da-36f613d6da68", "Car Guy", "CARGUY" });
+                values: new object[] { "363bec47-3d1b-4e83-a73d-f87a0c48229d", "ab0f78c5-4fc3-49b5-93db-8e5931c6d6a1", "CarGuy", "CARGUY" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

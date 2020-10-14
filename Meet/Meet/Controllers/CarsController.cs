@@ -13,7 +13,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace Meet.Controllers
 {
-    [Authorize(Roles = "Car Guy")]
+    [Authorize(Roles = "CarGuy")]
     public class CarsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -29,13 +29,17 @@ namespace Meet.Controllers
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
             var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
-            List<Car> cars = garage.Car.ToList();
+ 
+            if(garage.Car == null)
+            {
+                return RedirectToAction("Create");
+            }
             if (client == null)
             {
-                return RedirectToAction
+                return RedirectToAction("CreateClient");
             }
            
-            return View(cars);
+            return View(garage.Car);
         }
 
         // GET: Cars/Details/5
@@ -72,7 +76,8 @@ namespace Meet.Controllers
         {
             if (ModelState.IsValid)
             {
-
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                client.IdentityUserId = userId;
                 _context.Add(client);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

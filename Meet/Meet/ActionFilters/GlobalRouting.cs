@@ -20,16 +20,12 @@ namespace Meet.ActionFilters
             var controller = context.RouteData.Values["controller"];
             if (controller.Equals("Home"))
             {
-                if (_claimsPrincipal.IsInRole("Customer"))
+                if (_claimsPrincipal.IsInRole("CarGuy"))
                 {
                     context.Result = new RedirectToActionResult("Index",
-                    "Customers", null);
+                    "Clients", null);
                 }
-                else if (_claimsPrincipal.IsInRole("Employee"))
-                {
-                    context.Result = new RedirectToActionResult("Index",
-                    "Employees", null);
-                }
+               
             }
         }
         public void OnActionExecuted(ActionExecutedContext context)

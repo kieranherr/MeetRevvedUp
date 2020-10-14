@@ -204,9 +204,9 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a066e5d7-70d5-4473-ba42-e79bbf871a74",
-                            ConcurrencyStamp = "ae9d52e1-fde9-4b54-a6da-36f613d6da68",
-                            Name = "Car Guy",
+                            Id = "363bec47-3d1b-4e83-a73d-f87a0c48229d",
+                            ConcurrencyStamp = "ab0f78c5-4fc3-49b5-93db-8e5931c6d6a1",
+                            Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });
                 });

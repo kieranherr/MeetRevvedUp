@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Meet.Controllers
 {
-    [Authorize(Roles = "Car Guy")]
+    [Authorize(Roles = "CarGuy")]
     public class ClientsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -31,12 +31,12 @@ namespace Meet.Controllers
             {
                 return RedirectToAction("Create");
             }
-            var applicationDbContext = _context.Clients.Include(c => c.IdentityUserId);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = _context.Clients.Include(c => c.IdentityUser);
+            return View("Details", client);
         }
 
         // GET: Clients/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id )
         {
             if (id == null)
             {

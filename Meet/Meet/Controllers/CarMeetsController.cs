@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Meet.Data;
 using Meet.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Meet.Controllers
 {
+    [Authorize(Roles ="CarGuy")]
     public class CarMeetsController : Controller
     {
         private readonly ApplicationDbContext _context;
