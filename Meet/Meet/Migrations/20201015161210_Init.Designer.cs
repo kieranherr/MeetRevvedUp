@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Meet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201015142306_Final")]
-    partial class Final
+    [Migration("20201015161210_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,9 +29,6 @@ namespace Meet.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AvgRating")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Car")
                         .HasColumnType("int");
 
                     b.Property<string>("IdentityUserId")
@@ -56,8 +53,6 @@ namespace Meet.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CarId");
-
-                    b.HasIndex("Car");
 
                     b.HasIndex("IdentityUserId");
 
@@ -162,6 +157,9 @@ namespace Meet.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("CarId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
@@ -169,6 +167,8 @@ namespace Meet.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("GarageId");
+
+                    b.HasIndex("CarId");
 
                     b.HasIndex("ClientId");
 
@@ -206,8 +206,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6a70d647-d2da-42c7-a73b-18967cce1c9a",
-                            ConcurrencyStamp = "c7787788-c6d6-45d0-b9c6-d298d46c7d5b",
+                            Id = "a4bfb29e-dc54-4812-b0d5-ab8acefc2239",
+                            ConcurrencyStamp = "5a59e43e-18f6-40c6-924f-be319c89b724",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });
@@ -384,10 +384,6 @@ namespace Meet.Migrations
 
             modelBuilder.Entity("Meet.Models.Car", b =>
                 {
-                    b.HasOne("Meet.Models.Garage", null)
-                        .WithMany("Car")
-                        .HasForeignKey("Car");
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()
                         .HasForeignKey("IdentityUserId");
@@ -425,6 +421,12 @@ namespace Meet.Migrations
 
             modelBuilder.Entity("Meet.Models.Garage", b =>
                 {
+                    b.HasOne("Meet.Models.Car", "Car")
+                        .WithMany()
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Meet.Models.Client", "Client")
                         .WithMany()
                         .HasForeignKey("ClientId")

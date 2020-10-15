@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Meet.Migrations
 {
-    public partial class Final : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -153,6 +153,32 @@ namespace Meet.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cars",
+                columns: table => new
+                {
+                    CarId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Vin = table.Column<string>(nullable: true),
+                    Make = table.Column<string>(nullable: true),
+                    Model = table.Column<string>(nullable: true),
+                    Year = table.Column<int>(nullable: false),
+                    Mileage = table.Column<int>(nullable: false),
+                    Mods = table.Column<string>(nullable: true),
+                    AvgRating = table.Column<int>(nullable: false),
+                    IdentityUserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cars", x => x.CarId);
+                    table.ForeignKey(
+                        name: "FK_Cars_AspNetUsers_IdentityUserId",
+                        column: x => x.IdentityUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Clients",
                 columns: table => new
                 {
@@ -177,65 +203,6 @@ namespace Meet.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Clients_AspNetUsers_IdentityUserId",
-                        column: x => x.IdentityUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Garages",
-                columns: table => new
-                {
-                    GarageId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(nullable: false),
-                    IdentityUserId = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Garages", x => x.GarageId);
-                    table.ForeignKey(
-                        name: "FK_Garages_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Garages_AspNetUsers_IdentityUserId",
-                        column: x => x.IdentityUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Cars",
-                columns: table => new
-                {
-                    CarId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Vin = table.Column<string>(nullable: true),
-                    Make = table.Column<string>(nullable: true),
-                    Model = table.Column<string>(nullable: true),
-                    Year = table.Column<int>(nullable: false),
-                    Mileage = table.Column<int>(nullable: false),
-                    Mods = table.Column<string>(nullable: true),
-                    AvgRating = table.Column<int>(nullable: false),
-                    IdentityUserId = table.Column<string>(nullable: true),
-                    Car = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Cars", x => x.CarId);
-                    table.ForeignKey(
-                        name: "FK_Cars_Garages_Car",
-                        column: x => x.Car,
-                        principalTable: "Garages",
-                        principalColumn: "GarageId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Cars_AspNetUsers_IdentityUserId",
                         column: x => x.IdentityUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -284,10 +251,43 @@ namespace Meet.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Garages",
+                columns: table => new
+                {
+                    GarageId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(nullable: false),
+                    CarId = table.Column<int>(nullable: false),
+                    IdentityUserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Garages", x => x.GarageId);
+                    table.ForeignKey(
+                        name: "FK_Garages_Cars_CarId",
+                        column: x => x.CarId,
+                        principalTable: "Cars",
+                        principalColumn: "CarId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Garages_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Garages_AspNetUsers_IdentityUserId",
+                        column: x => x.IdentityUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "6a70d647-d2da-42c7-a73b-18967cce1c9a", "c7787788-c6d6-45d0-b9c6-d298d46c7d5b", "CarGuy", "CARGUY" });
+                values: new object[] { "a4bfb29e-dc54-4812-b0d5-ab8acefc2239", "5a59e43e-18f6-40c6-924f-be319c89b724", "CarGuy", "CARGUY" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -344,11 +344,6 @@ namespace Meet.Migrations
                 column: "IdentityUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cars_Car",
-                table: "Cars",
-                column: "Car");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Cars_IdentityUserId",
                 table: "Cars",
                 column: "IdentityUserId");
@@ -362,6 +357,11 @@ namespace Meet.Migrations
                 name: "IX_Clients_IdentityUserId",
                 table: "Clients",
                 column: "IdentityUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Garages_CarId",
+                table: "Garages",
+                column: "CarId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Garages_ClientId",
@@ -395,13 +395,13 @@ namespace Meet.Migrations
                 name: "CarMeets");
 
             migrationBuilder.DropTable(
+                name: "Garages");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Cars");
-
-            migrationBuilder.DropTable(
-                name: "Garages");
 
             migrationBuilder.DropTable(
                 name: "Clients");

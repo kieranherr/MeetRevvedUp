@@ -61,7 +61,7 @@ namespace Meet.Controllers
                 var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
                 garage.ClientId = client.ClientId;
                 garage.IdentityUserId = userId;
-                garage.Car = new List<Car>();
+                //garage.Car = new List<Car>();
                 _context.Add(garage);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

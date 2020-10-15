@@ -104,7 +104,7 @@ namespace Meet.Controllers
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
                 var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
-                garage.Car.Add(car);
+                //garage.Car.Add(car);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
