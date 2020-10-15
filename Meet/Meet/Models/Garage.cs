@@ -17,7 +17,9 @@ namespace Meet.Models
         public Client Client { get; set; }
 
         [ForeignKey("Car")]
-        public List<Car> Car { get; set; }
+        public int CarId { get; set; }
+        public Car Car { get; set; }
+
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }

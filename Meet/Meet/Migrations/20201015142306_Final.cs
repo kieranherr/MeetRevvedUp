@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Meet.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Final : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -287,7 +287,7 @@ namespace Meet.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "363bec47-3d1b-4e83-a73d-f87a0c48229d", "ab0f78c5-4fc3-49b5-93db-8e5931c6d6a1", "CarGuy", "CARGUY" });
+                values: new object[] { "6a70d647-d2da-42c7-a73b-18967cce1c9a", "c7787788-c6d6-45d0-b9c6-d298d46c7d5b", "CarGuy", "CARGUY" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

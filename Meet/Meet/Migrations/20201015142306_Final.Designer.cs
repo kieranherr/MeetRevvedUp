@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Meet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201014190204_Initial")]
-    partial class Initial
+    [Migration("20201015142306_Final")]
+    partial class Final
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -206,8 +206,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "363bec47-3d1b-4e83-a73d-f87a0c48229d",
-                            ConcurrencyStamp = "ab0f78c5-4fc3-49b5-93db-8e5931c6d6a1",
+                            Id = "6a70d647-d2da-42c7-a73b-18967cce1c9a",
+                            ConcurrencyStamp = "c7787788-c6d6-45d0-b9c6-d298d46c7d5b",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });

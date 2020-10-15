@@ -101,12 +101,15 @@ namespace Meet.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(car);
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+                var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
+                garage.Car.Add(car);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(car);
         }
-
         // GET: Cars/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
