@@ -27,17 +27,14 @@ namespace Meet.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-            var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
+            var car = _context.Cars.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var garage = _context.Garages.Where(g => g.CarId == car.CarId).FirstOrDefault();
  
             if(garage.Car == null)
             {
                 return RedirectToAction("Create");
             }
-            if (client == null)
-            {
-                return RedirectToAction("CreateClient");
-            }
+            
            
             return View(garage.Car);
         }
@@ -59,32 +56,6 @@ namespace Meet.Controllers
 
             return View(car);
         }
-
-        // GET: Clients/Create
-        public IActionResult CreateClient()
-        {
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
-        }
-
-        // POST: Clients/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateClient([Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City")] Client client)
-        {
-            if (ModelState.IsValid)
-            {
-                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                client.IdentityUserId = userId;
-                _context.Add(client);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", client.IdentityUserId);
-            return View(client);
-        }
         // GET: Cars/Create
         public IActionResult Create()
         {
@@ -104,7 +75,6 @@ namespace Meet.Controllers
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
                 var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
-                //garage.Car.Add(car);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

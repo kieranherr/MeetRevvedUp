@@ -23,10 +23,8 @@ namespace Meet.Models
         public string MeetDate { get; set; }
         [ForeignKey("Car")]
         public int CarId { get; set; } 
-        public Car Car { get; set; }
-        [ForeignKey("Client")]
-        public int ClientId { get; set; }
-        public Client Client { get; set; }
+        public Car Car { get; set; } 
+        public List<Client> Clients { get; set; }
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }

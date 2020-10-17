@@ -67,6 +67,11 @@
         </dd>
     </dl>
 </div>
+<div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item"
+            src="https://www.google.com/maps/embed/v1/place?zoom=16&q=@Model.Lat,@Model.Long&key=@Meet.APIKeys.GoogleApiKey"></iframe>
+
+</div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.MeetId">Edit</a> |
     <a asp-action="Index">Back to List</a>

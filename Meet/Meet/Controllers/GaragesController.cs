@@ -47,7 +47,29 @@ namespace Meet.Controllers
         {
             return View();
         }
+        // GET: Cars/Create
+        public IActionResult CreateCar()
+        {
+            return View();
+        }
 
+        // POST: Cars/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateCar([Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating")] Car car)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                car.IdentityUserId = userId;
+                _context.Add(car);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(car);
+        }
         // POST: Garages/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -61,7 +83,14 @@ namespace Meet.Controllers
                 var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
                 garage.ClientId = client.ClientId;
                 garage.IdentityUserId = userId;
-                //garage.Car = new List<Car>();
+                var car = _context.Cars.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+                 if (car == null)
+                {
+                    return RedirectToAction("CreateCar");
+                }
+                garage.CarId = car.CarId;
+               
+
                 _context.Add(garage);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

@@ -56,7 +56,7 @@ namespace Meet.Controllers
 
         // GET: Clients/Create
         public IActionResult Create()
-        {
+        { 
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }

@@ -9,6 +9,8 @@ using Meet.Data;
 using Meet.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace Meet.Controllers
 {
@@ -64,10 +66,23 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MeetId,MeetName,Lat,Long,Street,City,State,Zip,MeetTime,MeetDate")] CarMeet carMeet)
+        public async Task<IActionResult> Create([Bind("MeetId,MeetName,Street,City,State,Zip,MeetTime,MeetDate")] CarMeet carMeet)
         {
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={carMeet.Street},+{carMeet.City},+{carMeet.State}&key={APIKeys.GeocodeKey}";
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync(url);
+            string jsonResult = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                JObject geoCode = JObject.Parse(jsonResult);
+                carMeet.Lat = (double)geoCode["results"][0]["geometry"]["location"]["lat"];
+                carMeet.Long = (double)geoCode["results"][0]["geometry"]["location"]["lng"];
+            }
             if (ModelState.IsValid)
             {
+                carMeet.Clients = new List<Client>();
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                carMeet.IdentityUserId = userId;
                 _context.Add(carMeet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
