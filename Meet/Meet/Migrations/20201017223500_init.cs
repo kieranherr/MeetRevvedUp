@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Meet.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -153,6 +153,34 @@ namespace Meet.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CarMeets",
+                columns: table => new
+                {
+                    MeetId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MeetName = table.Column<string>(nullable: true),
+                    Lat = table.Column<double>(nullable: false),
+                    Long = table.Column<double>(nullable: false),
+                    Street = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    State = table.Column<string>(nullable: true),
+                    Zip = table.Column<long>(nullable: false),
+                    MeetTime = table.Column<string>(nullable: true),
+                    MeetDate = table.Column<string>(nullable: true),
+                    IdentityUserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CarMeets", x => x.MeetId);
+                    table.ForeignKey(
+                        name: "FK_CarMeets_AspNetUsers_IdentityUserId",
+                        column: x => x.IdentityUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Cars",
                 columns: table => new
                 {
@@ -172,41 +200,6 @@ namespace Meet.Migrations
                     table.PrimaryKey("PK_Cars", x => x.CarId);
                     table.ForeignKey(
                         name: "FK_Cars_AspNetUsers_IdentityUserId",
-                        column: x => x.IdentityUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CarMeets",
-                columns: table => new
-                {
-                    MeetId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MeetName = table.Column<string>(nullable: true),
-                    Lat = table.Column<double>(nullable: false),
-                    Long = table.Column<double>(nullable: false),
-                    Street = table.Column<string>(nullable: true),
-                    City = table.Column<string>(nullable: true),
-                    State = table.Column<string>(nullable: true),
-                    Zip = table.Column<long>(nullable: false),
-                    MeetTime = table.Column<string>(nullable: true),
-                    MeetDate = table.Column<string>(nullable: true),
-                    CarId = table.Column<int>(nullable: false),
-                    IdentityUserId = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CarMeets", x => x.MeetId);
-                    table.ForeignKey(
-                        name: "FK_CarMeets_Cars_CarId",
-                        column: x => x.CarId,
-                        principalTable: "Cars",
-                        principalColumn: "CarId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CarMeets_AspNetUsers_IdentityUserId",
                         column: x => x.IdentityUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -287,7 +280,7 @@ namespace Meet.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "22f9ccd3-93f8-4424-983d-ea89062f742b", "728537fe-32c8-4f9a-b840-12dd14d0d970", "CarGuy", "CARGUY" });
+                values: new object[] { "47d52b39-dd06-4826-b8f8-0c426affe7fe", "44ac33a6-7e06-4068-9de4-b89c1d1e43c1", "CarGuy", "CARGUY" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -327,11 +320,6 @@ namespace Meet.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CarMeets_CarId",
-                table: "CarMeets",
-                column: "CarId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CarMeets_IdentityUserId",
@@ -398,13 +386,13 @@ namespace Meet.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Cars");
+
+            migrationBuilder.DropTable(
                 name: "Clients");
 
             migrationBuilder.DropTable(
                 name: "CarMeets");
-
-            migrationBuilder.DropTable(
-                name: "Cars");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

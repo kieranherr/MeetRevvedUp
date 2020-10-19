@@ -21,9 +21,7 @@ namespace Meet.Models
         public long Zip { get; set; }
         public string MeetTime { get; set; }
         public string MeetDate { get; set; }
-        [ForeignKey("Car")]
-        public int CarId { get; set; } 
-        public Car Car { get; set; } 
+        
         public List<Client> Clients { get; set; }
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }

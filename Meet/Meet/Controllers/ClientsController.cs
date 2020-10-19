@@ -66,10 +66,12 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City,IdentityUserId")] Client client)
+        public async Task<IActionResult> Create([Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City")] Client client)
         {
             if (ModelState.IsValid)
             {
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                client.IdentityUserId = userId;
                 _context.Add(client);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

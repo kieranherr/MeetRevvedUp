@@ -27,13 +27,13 @@ namespace Meet.Controllers
         // GET: CarMeets
         public async Task<IActionResult> Index()
         {
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var carMeets = _context.CarMeets.Where(m => m.IdentityUserId == userId).FirstOrDefault();
+
+            var carMeets = _context.CarMeets;
             if (carMeets == null)
             {
                 return RedirectToAction("Create");
             }
-            var applicationDbContext = _context.CarMeets.Include(m => m.IdentityUserId);
+            var applicationDbContext = _context.CarMeets;
             return View(await applicationDbContext.ToListAsync());
         }
 

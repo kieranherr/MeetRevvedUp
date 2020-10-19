@@ -64,9 +64,6 @@ namespace Meet.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
@@ -98,8 +95,6 @@ namespace Meet.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("MeetId");
-
-                    b.HasIndex("CarId");
 
                     b.HasIndex("IdentityUserId");
 
@@ -204,8 +199,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "5dfb672c-be41-4e17-8fce-0d38698483e9",
-                            ConcurrencyStamp = "28ca3cb0-f3b6-4209-b3a9-d903805ed888",
+                            Id = "47d52b39-dd06-4826-b8f8-0c426affe7fe",
+                            ConcurrencyStamp = "44ac33a6-7e06-4068-9de4-b89c1d1e43c1",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });
@@ -389,12 +384,6 @@ namespace Meet.Migrations
 
             modelBuilder.Entity("Meet.Models.CarMeet", b =>
                 {
-                    b.HasOne("Meet.Models.Car", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()
                         .HasForeignKey("IdentityUserId");

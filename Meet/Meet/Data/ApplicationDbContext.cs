@@ -31,5 +31,6 @@ namespace Meet.Data
            }
             );
         }
+        public DbSet<Meet.Models.Attendance> Attendance { get; set; }
     }
 }

@@ -56,6 +56,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.CarId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a type="button" asp-action="Edit" asp-route-id="@Model.CarId" class="btn btn-primary">Edit Your Car</a>
+    <a type="button" asp-controller="Clients" asp-action="Index" class="btn btn-primary">Go To Back To Your Profile</a>
 </div>
