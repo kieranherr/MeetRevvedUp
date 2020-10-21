@@ -47,6 +47,18 @@ namespace Meet.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Attendance",
+                columns: table => new
+                {
+                    AttendanceId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attendance", x => x.AttendanceId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -218,12 +230,19 @@ namespace Meet.Migrations
                     Age = table.Column<int>(nullable: false),
                     City = table.Column<string>(nullable: true),
                     IdentityUserId = table.Column<string>(nullable: true),
+                    AttendanceId = table.Column<int>(nullable: true),
                     CarMeetMeetId = table.Column<int>(nullable: true),
                     ClientId1 = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Clients", x => x.ClientId);
+                    table.ForeignKey(
+                        name: "FK_Clients_Attendance_AttendanceId",
+                        column: x => x.AttendanceId,
+                        principalTable: "Attendance",
+                        principalColumn: "AttendanceId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Clients_CarMeets_CarMeetMeetId",
                         column: x => x.CarMeetMeetId,
@@ -280,7 +299,7 @@ namespace Meet.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "47d52b39-dd06-4826-b8f8-0c426affe7fe", "44ac33a6-7e06-4068-9de4-b89c1d1e43c1", "CarGuy", "CARGUY" });
+                values: new object[] { "dea5d72d-907d-400b-a279-6662fa64caa3", "d364be0c-5e9b-4310-9876-a5c881dbd04a", "CarGuy", "CARGUY" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -330,6 +349,11 @@ namespace Meet.Migrations
                 name: "IX_Cars_IdentityUserId",
                 table: "Cars",
                 column: "IdentityUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Clients_AttendanceId",
+                table: "Clients",
+                column: "AttendanceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Clients_CarMeetMeetId",
@@ -390,6 +414,9 @@ namespace Meet.Migrations
 
             migrationBuilder.DropTable(
                 name: "Clients");
+
+            migrationBuilder.DropTable(
+                name: "Attendance");
 
             migrationBuilder.DropTable(
                 name: "CarMeets");

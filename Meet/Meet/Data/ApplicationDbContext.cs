@@ -19,6 +19,7 @@ namespace Meet.Data
         public DbSet<Client> Clients { get; set; }
         public DbSet<Garage> Garages { get; set; }
         public DbSet<CarMeet> CarMeets { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

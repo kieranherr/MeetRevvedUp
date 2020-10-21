@@ -31,7 +31,6 @@ namespace Meet.Controllers
             {
                 return RedirectToAction("Create");
             }
-            var applicationDbContext = _context.Clients.Include(c => c.IdentityUser);
             return View("Details", client);
         }
 

@@ -10,16 +10,28 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Meet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201017223500_init")]
+    [Migration("20201020210936_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.8")
+                .HasAnnotation("ProductVersion", "3.1.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Meet.Models.Attendance", b =>
+                {
+                    b.Property<int>("AttendanceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.HasKey("AttendanceId");
+
+                    b.ToTable("Attendance");
+                });
 
             modelBuilder.Entity("Meet.Models.Car", b =>
                 {
@@ -113,6 +125,9 @@ namespace Meet.Migrations
                     b.Property<int>("Age")
                         .HasColumnType("int");
 
+                    b.Property<int?>("AttendanceId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("CarMeetMeetId")
                         .HasColumnType("int");
 
@@ -135,6 +150,8 @@ namespace Meet.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("ClientId");
+
+                    b.HasIndex("AttendanceId");
 
                     b.HasIndex("CarMeetMeetId");
 
@@ -201,8 +218,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "47d52b39-dd06-4826-b8f8-0c426affe7fe",
-                            ConcurrencyStamp = "44ac33a6-7e06-4068-9de4-b89c1d1e43c1",
+                            Id = "dea5d72d-907d-400b-a279-6662fa64caa3",
+                            ConcurrencyStamp = "d364be0c-5e9b-4310-9876-a5c881dbd04a",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });
@@ -393,6 +410,10 @@ namespace Meet.Migrations
 
             modelBuilder.Entity("Meet.Models.Client", b =>
                 {
+                    b.HasOne("Meet.Models.Attendance", null)
+                        .WithMany("Clients")
+                        .HasForeignKey("AttendanceId");
+
                     b.HasOne("Meet.Models.CarMeet", null)
                         .WithMany("Clients")
                         .HasForeignKey("CarMeetMeetId");
