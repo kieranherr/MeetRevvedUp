@@ -16,12 +16,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.MeetName)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Lat)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Long)
-            </th>
+        
             <th>
                 @Html.DisplayNameFor(model => model.Street)
             </th>
@@ -50,12 +45,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.MeetName)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Lat)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Long)
-                </td>
+             
                 <td>
                     @Html.DisplayFor(modelItem => item.Street)
                 </td>
@@ -75,9 +65,7 @@
                     @Html.DisplayFor(modelItem => item.MeetDate)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.MeetId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.MeetId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.MeetId">Delete</a>
+                    <a asp-action="Details" asp-route-id="@item.MeetId">Details</a> 
                 </td>
             </tr>
         }
@@ -193,7 +181,7 @@
             new google.maps.Marker({
                 position: myLatLng,
                 map,
-                title: meet.MeetName,
+                title: meet.meetName,
             });
         }
     }
