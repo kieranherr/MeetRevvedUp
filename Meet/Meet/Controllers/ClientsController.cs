@@ -57,6 +57,8 @@ namespace Meet.Controllers
         public IActionResult Create()
         { 
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
+
+
             return View();
         }
 
@@ -161,6 +163,7 @@ namespace Meet.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+       
 
         private bool ClientExists(int id)
         {

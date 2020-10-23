@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ namespace Meet.Models
 {
     public class CarMeet
     {
-        [Key  ]
+        [Key]
         public int MeetId { get; set; }
         public string MeetName { get; set; }
         public double Lat { get; set; }
@@ -21,8 +22,7 @@ namespace Meet.Models
         public long Zip { get; set; }
         public string MeetTime { get; set; }
         public string MeetDate { get; set; }
-        
-        public List<Client> Clients { get; set; }
+
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }

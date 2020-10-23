@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Meet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201020210936_init")]
+    [Migration("20201023163911_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,18 +20,6 @@ namespace Meet.Migrations
                 .HasAnnotation("ProductVersion", "3.1.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Meet.Models.Attendance", b =>
-                {
-                    b.Property<int>("AttendanceId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.HasKey("AttendanceId");
-
-                    b.ToTable("Attendance");
-                });
 
             modelBuilder.Entity("Meet.Models.Car", b =>
                 {
@@ -125,17 +113,8 @@ namespace Meet.Migrations
                     b.Property<int>("Age")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AttendanceId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CarMeetMeetId")
-                        .HasColumnType("int");
-
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ClientId1")
-                        .HasColumnType("int");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
@@ -151,15 +130,34 @@ namespace Meet.Migrations
 
                     b.HasKey("ClientId");
 
-                    b.HasIndex("AttendanceId");
-
-                    b.HasIndex("CarMeetMeetId");
-
-                    b.HasIndex("ClientId1");
-
                     b.HasIndex("IdentityUserId");
 
                     b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("Meet.Models.ClientMeet", b =>
+                {
+                    b.Property<int>("ClientMeetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MeetId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("carMeetMeetId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ClientMeetId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("carMeetMeetId");
+
+                    b.ToTable("ClientMeets");
                 });
 
             modelBuilder.Entity("Meet.Models.Garage", b =>
@@ -218,8 +216,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "dea5d72d-907d-400b-a279-6662fa64caa3",
-                            ConcurrencyStamp = "d364be0c-5e9b-4310-9876-a5c881dbd04a",
+                            Id = "c931f068-0ba7-4d87-a8a4-273676fae509",
+                            ConcurrencyStamp = "6e100bc4-33f0-49f2-825d-1efc4ef0fcac",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });
@@ -410,21 +408,22 @@ namespace Meet.Migrations
 
             modelBuilder.Entity("Meet.Models.Client", b =>
                 {
-                    b.HasOne("Meet.Models.Attendance", null)
-                        .WithMany("Clients")
-                        .HasForeignKey("AttendanceId");
-
-                    b.HasOne("Meet.Models.CarMeet", null)
-                        .WithMany("Clients")
-                        .HasForeignKey("CarMeetMeetId");
-
-                    b.HasOne("Meet.Models.Client", null)
-                        .WithMany("Friends")
-                        .HasForeignKey("ClientId1");
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()
                         .HasForeignKey("IdentityUserId");
+                });
+
+            modelBuilder.Entity("Meet.Models.ClientMeet", b =>
+                {
+                    b.HasOne("Meet.Models.Client", "client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Meet.Models.CarMeet", "carMeet")
+                        .WithMany()
+                        .HasForeignKey("carMeetMeetId");
                 });
 
             modelBuilder.Entity("Meet.Models.Garage", b =>

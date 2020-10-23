@@ -50,6 +50,7 @@ namespace Meet.Controllers
             {
                 return NotFound();
             }
+           
 
             
 
@@ -84,7 +85,7 @@ namespace Meet.Controllers
                 List<Client> clients = new List<Client>();
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 carMeet.IdentityUserId = userId;
-                carMeet.Clients = clients;
+               
                 _context.Add(carMeet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -93,20 +94,20 @@ namespace Meet.Controllers
         }
 
         // GET: CarMeets/Edit/5
-        public async Task<IActionResult> Edit()
+        public async Task<IActionResult> Edit(int? id)
         {
-            var id = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (id == null)
             {
                 return NotFound();
             }
 
-            var carMeet =  _context.CarMeets.Where(c => c.IdentityUserId == id).FirstOrDefault();
+
+            var carMeet =  _context.CarMeets.FindAsync(id);
             if (carMeet == null)
             {
                 return NotFound();
             }
-            return View(carMeet);
+            return View();
         }
 
         // POST: CarMeets/Edit/5
@@ -117,21 +118,15 @@ namespace Meet.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("")] CarMeet carMeet)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var tempCarMeet = _context.CarMeets.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-            if (tempCarMeet.MeetId != carMeet.MeetId)
-            {
-                return NotFound();
-            }
-            carMeet = tempCarMeet;
+            carMeet = _context.CarMeets.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            
             if (ModelState.IsValid)
             {
                 try
                 {
                    
                     var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-                    List<Client> clients = new List<Client>();
-                    clients.Add(client);
-                    carMeet.Clients = clients;
+                    
                     _context.Update(carMeet);
                     await _context.SaveChangesAsync();
                 }
@@ -179,7 +174,31 @@ namespace Meet.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> RSVP(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
+
+           
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RSVP()
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var carMeet = _context.CarMeets.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            ClientMeet clientMeet = new ClientMeet();
+            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            clientMeet.ClientId = client.ClientId;
+            clientMeet.MeetId = carMeet.MeetId;
+            _context.ClientMeets.Add(clientMeet);
+            await _context.SaveChangesAsync();
+            return View("Details", carMeet);
+        }
         private bool CarMeetExists(int id)
         {
             return _context.CarMeets.Any(e => e.MeetId == id);
