@@ -38,7 +38,22 @@ namespace Meet.Controllers
            
             return View(garage.Car);
         }
+        public async Task<IActionResult> ClientDetails(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var garage = _context.Garages.Where(g => g.ClientId == id).FirstOrDefault();
 
+            var car = await _context.Cars.FirstOrDefaultAsync(m => m.CarId == garage.CarId);
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            return View(car);
+        }
         // GET: Cars/Details/5
         public async Task<IActionResult> Details(int? id)
         {

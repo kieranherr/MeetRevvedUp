@@ -36,6 +36,22 @@ namespace Meet.Controllers
             var applicationDbContext = _context.CarMeets;
             return View(await applicationDbContext.ToListAsync());
         }
+        public async Task<IActionResult> RSVPIndex(int? id)
+        {
+
+            var rsvps = _context.ClientMeets.Where(c => c.MeetId == id);
+            if (rsvps == null)
+            {
+                return RedirectToAction("Index");
+            }
+            List<Client> clients = new List<Client>();
+            foreach(var item in rsvps)
+            {
+                var client = _context.Clients.Where(c => c.ClientId == item.ClientId).FirstOrDefault();
+                clients.Add(client);
+            }
+            return View(clients);
+        }
 
         // GET: CarMeets/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -180,17 +196,17 @@ namespace Meet.Controllers
             {
                 return NotFound();
             }
-
+            var carMeet = _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefault();
 
            
-            return View();
+            return View(carMeet);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RSVP()
+        public async Task<IActionResult> RSVP(CarMeet carMeet)
         {
+            carMeet = _context.CarMeets.Where(c => c.MeetId == carMeet.MeetId).FirstOrDefault();
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var carMeet = _context.CarMeets.Where(c => c.IdentityUserId == userId).FirstOrDefault();
             ClientMeet clientMeet = new ClientMeet();
             var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
             clientMeet.ClientId = client.ClientId;

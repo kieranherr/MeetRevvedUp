@@ -214,8 +214,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c931f068-0ba7-4d87-a8a4-273676fae509",
-                            ConcurrencyStamp = "6e100bc4-33f0-49f2-825d-1efc4ef0fcac",
+                            Id = "6ec9d9d3-2a12-4e57-a8eb-eea5282afdba",
+                            ConcurrencyStamp = "9217d0f8-b11e-46b9-81f7-256a0d1fa3ae",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });
