@@ -17,7 +17,6 @@ namespace Meet.Models
         public long PhoneNumber { get; set; }
         public int Age { get; set; }
         public string City { get; set; }
-
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }

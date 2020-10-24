@@ -10,6 +10,8 @@ using Meet.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Reflection.Metadata.Ecma335;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace Meet.Controllers
 {
@@ -101,11 +103,20 @@ namespace Meet.Controllers
                         throw;
                     }
                 }
+                TwilioClient.Init(APIKeys.TwilioAccountSid, APIKeys.TwilioAuthToken);
+                var garage = _context.Garages.Where(c => c.CarId == id).FirstOrDefault();
+                var client = _context.Clients.Where(c => c.ClientId == garage.ClientId).FirstOrDefault();
+
+                var message = MessageResource.Create(
+            body: $"Your {car.Year} {car.Make} {car.Model} was just rated at a Meet! Check it out!",
+            from: new Twilio.Types.PhoneNumber("+12513519207"),
+            to: new Twilio.Types.PhoneNumber("+1"+client.PhoneNumber.ToString())
+        );
                 return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());
             }
             return View(car);
         }
-        // GET: Cars/Details/5
+        // GET: Cars/Details/5 
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

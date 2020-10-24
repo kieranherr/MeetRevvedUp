@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Meet.Migrations
 {
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,6 +44,20 @@ namespace Meet.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Friends",
+                columns: table => new
+                {
+                    FriendId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FriendOneId = table.Column<int>(nullable: false),
+                    FriendTwoId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Friends", x => x.FriendId);
                 });
 
             migrationBuilder.CreateTable(
@@ -293,7 +307,7 @@ namespace Meet.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "6ec9d9d3-2a12-4e57-a8eb-eea5282afdba", "9217d0f8-b11e-46b9-81f7-256a0d1fa3ae", "CarGuy", "CARGUY" });
+                values: new object[] { "3d0c5be5-4fa8-47d9-97df-a094fe5435b5", "2a34968e-2cc2-42cb-840a-7703930b9859", "CarGuy", "CARGUY" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -394,6 +408,9 @@ namespace Meet.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClientMeets");
+
+            migrationBuilder.DropTable(
+                name: "Friends");
 
             migrationBuilder.DropTable(
                 name: "Garages");

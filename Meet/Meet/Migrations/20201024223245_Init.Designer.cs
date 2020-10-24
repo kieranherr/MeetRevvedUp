@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Meet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201024194055_init")]
-    partial class init
+    [Migration("20201024223245_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -160,6 +160,24 @@ namespace Meet.Migrations
                     b.ToTable("ClientMeets");
                 });
 
+            modelBuilder.Entity("Meet.Models.Friend", b =>
+                {
+                    b.Property<int>("FriendId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("FriendOneId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FriendTwoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FriendId");
+
+                    b.ToTable("Friends");
+                });
+
             modelBuilder.Entity("Meet.Models.Garage", b =>
                 {
                     b.Property<int>("GarageId")
@@ -216,8 +234,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6ec9d9d3-2a12-4e57-a8eb-eea5282afdba",
-                            ConcurrencyStamp = "9217d0f8-b11e-46b9-81f7-256a0d1fa3ae",
+                            Id = "3d0c5be5-4fa8-47d9-97df-a094fe5435b5",
+                            ConcurrencyStamp = "2a34968e-2cc2-42cb-840a-7703930b9859",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });
