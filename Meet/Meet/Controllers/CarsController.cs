@@ -54,6 +54,57 @@ namespace Meet.Controllers
 
             return View(car);
         }
+        public async Task<IActionResult> CarRate(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var car = await _context.Cars.FindAsync(id);
+            if (car == null)
+            {
+                return NotFound();
+            }
+            return View(car);
+        }
+
+        // POST: Cars/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CarRate(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating,IdentityUserId")] Car car, int newRate)
+        {
+            if (id != car.CarId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+             
+                    car.AvgRating = (newRate + car.AvgRating) / 2;
+                    _context.Update(car);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CarExists(car.CarId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());
+            }
+            return View(car);
+        }
         // GET: Cars/Details/5
         public async Task<IActionResult> Details(int? id)
         {
