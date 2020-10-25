@@ -74,26 +74,21 @@ namespace Meet.Controllers
                                 carThree = item;
                             }
                         }
-                        else if(item.AvgRating == carTwo.AvgRating)
+                        else
                         {
                             carThree = carTwo;
                             carTwo = item;
-                        }
-                        else
-                        {
-                            carTwo = item;
+                      
+                       
                         }
                     }
-                    else if (item.AvgRating == carTwo.AvgRating)
+                    else
                     {
                         carThree = carTwo;
                         carTwo = carOne;
                         carOne = item;
                     }
-                    else
-                    {
-                        carOne = item;
-                    }
+                    
             }
             topThree.Add(carOne);
             topThree.Add(carTwo);
