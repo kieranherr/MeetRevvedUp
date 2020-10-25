@@ -33,6 +33,19 @@ namespace Meet.Controllers
             }
             return View("Details", client);
         }
+        public async Task<IActionResult> FriendIndex()
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            List<Client> clients = new List<Client>();
+            var friends = _context.Friends.Where(f => f.FriendOneId == client.ClientId);
+            foreach(var item in friends)
+            {
+                var tempClient = _context.Clients.Where(c => c.ClientId == item.FriendTwoId).FirstOrDefault();
+                clients.Add(tempClient);
+            }
+            return View(clients);
+        }
 
         // GET: Clients/Details/5
         public async Task<IActionResult> Details(int? id )
