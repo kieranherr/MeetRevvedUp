@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Reflection.Metadata.Ecma335;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+using Microsoft.AspNetCore.Razor.Hosting;
 
 namespace Meet.Controllers
 {
@@ -39,6 +40,66 @@ namespace Meet.Controllers
             
            
             return View(garage.Car);
+        }
+        public async Task<IActionResult> TopThree(int? id)
+        {
+            var clientMeets = _context.ClientMeets.Where(c => c.MeetId == id);
+            List<Car> cars = new List<Car>();
+            foreach (var item in clientMeets)
+            {
+                var clients = _context.Clients.Where(c => c.ClientId == item.ClientId);
+                var garage = _context.Garages.Where(g => g.ClientId == item.ClientId).FirstOrDefault();
+                var car = _context.Cars.Where(c => c.CarId == garage.CarId).FirstOrDefault();
+                cars.Add(car);
+            }
+            List<Car> topThree = new List<Car>();
+            var carOne = new Car();
+            var carTwo = new Car();
+            var carThree = new Car();
+            carOne.AvgRating = 0;
+            carTwo.AvgRating = 0;
+            carThree.AvgRating = 0;
+            foreach (var item in cars)
+            {
+                    if(item.AvgRating < carOne.AvgRating && item.AvgRating != carOne.AvgRating)
+                    {
+                        if(item.AvgRating < carTwo.AvgRating && item.AvgRating != carTwo.AvgRating)
+                        {
+                            if(item.AvgRating < carThree.AvgRating && item.AvgRating != carThree.AvgRating)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                carThree = item;
+                            }
+                        }
+                        else if(item.AvgRating == carTwo.AvgRating)
+                        {
+                            carThree = carTwo;
+                            carTwo = item;
+                        }
+                        else
+                        {
+                            carTwo = item;
+                        }
+                    }
+                    else if (item.AvgRating == carTwo.AvgRating)
+                    {
+                        carThree = carTwo;
+                        carTwo = carOne;
+                        carOne = item;
+                    }
+                    else
+                    {
+                        carOne = item;
+                    }
+            }
+            topThree.Add(carOne);
+            topThree.Add(carTwo);
+            topThree.Add(carThree);
+            
+            return View(topThree);
         }
         public async Task<IActionResult> ClientDetails(int? id)
         {
