@@ -12,8 +12,11 @@ namespace Meet.Models
     {
         [Key]
         public int ClientId { get; set; }
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
+        [Display(Name = "Phone Number")]
         public long PhoneNumber { get; set; }
         public int Age { get; set; }
         public string City { get; set; }

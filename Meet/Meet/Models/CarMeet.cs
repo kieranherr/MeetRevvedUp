@@ -13,6 +13,7 @@ namespace Meet.Models
     {
         [Key]
         public int MeetId { get; set; }
+        [Display(Name = "Meet Name")]
         public string MeetName { get; set; }
         public double Lat { get; set; }
         public double Long { get; set; }
@@ -20,7 +21,9 @@ namespace Meet.Models
         public string City { get; set; }
         public string State { get; set; }
         public long Zip { get; set; }
+        [Display(Name = "Meet Time")]
         public string MeetTime { get; set; }
+        [Display(Name = "Meet Date")]
         public string MeetDate { get; set; }
 
         [ForeignKey("IdentityUser")]

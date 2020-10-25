@@ -1,14 +1,14 @@
 ﻿@model Meet.Models.Client
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Member";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<h1>Member</h1>
 
 <div>
-    <h4>Client</h4>
+
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -46,8 +46,8 @@
 </div>
 <div>
     <a type="button" asp-action="Edit" asp-route-id="@Model.ClientId" class="btn btn-primary">Edit</a>
-    <a type="button" asp-controller="Garages" asp-action="Index" class="btn btn-primary">Go To Your Garage!</a>
-    <a type="button" asp-controller="CarMeets" asp-action="Index" class="btn btn-primary">Go To The Meets!</a>
-    <a type="button" asp-controller="Clients" asp-action="FriendIndex" class="btn btn-primary">View Your Friends!</a>
+    <a type="button" asp-controller="Garages" asp-action="Index" class="btn btn-primary">Your Garage</a>
+    <a type="button" asp-controller="CarMeets" asp-action="Index" class="btn btn-primary">Go To The Meets</a>
+    <a type="button" asp-controller="Clients" asp-action="FriendIndex" class="btn btn-primary">Friends</a>
 </div>
  

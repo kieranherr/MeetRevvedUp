@@ -1,13 +1,13 @@
 ﻿@model Meet.Models.Friend
 
 @{
-    ViewData["Title"] = "AddFriend";
+    ViewData["Title"] = "Add Friend";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>AddFriend</h1>
+<h1>Add Friend</h1>
 
-<h4>Friend</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -15,7 +15,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="FriendTwoId" />
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Add" class="btn btn-primary" />
             </div>
         </form>
     </div>

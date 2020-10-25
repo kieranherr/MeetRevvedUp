@@ -18,6 +18,7 @@ namespace Meet.Models
         public int Year { get; set; }
         public int Mileage { get; set; }
         public string Mods { get; set; }
+        [Display(Name = "Rating")]
         public int AvgRating { get; set; } 
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }

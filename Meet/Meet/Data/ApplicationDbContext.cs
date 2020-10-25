@@ -21,6 +21,7 @@ namespace Meet.Data
         public DbSet<CarMeet> CarMeets { get; set; }
         public DbSet<ClientMeet> ClientMeets { get; set; }
         public DbSet<Friend> Friends { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

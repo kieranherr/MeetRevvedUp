@@ -4,14 +4,16 @@ using Meet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Meet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201025144847_AddComments")]
+    partial class AddComments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,35 +160,6 @@ namespace Meet.Migrations
                     b.ToTable("ClientMeets");
                 });
 
-            modelBuilder.Entity("Meet.Models.Comment", b =>
-                {
-                    b.Property<int>("CommentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CommentBody")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CommentorsName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Date")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MeetId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("carMeetMeetId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CommentId");
-
-                    b.HasIndex("carMeetMeetId");
-
-                    b.ToTable("Comments");
-                });
-
             modelBuilder.Entity("Meet.Models.Friend", b =>
                 {
                     b.Property<int>("FriendId")
@@ -261,8 +234,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "77c29ff4-e6a3-4210-a3ab-8f4fa47c5111",
-                            ConcurrencyStamp = "d4e69429-1fcb-4a91-af33-51c2be9d1d6f",
+                            Id = "6dab57cd-5dc7-4fdd-bd17-014ab4ffc6c2",
+                            ConcurrencyStamp = "a2bc0dea-e2a8-4479-8a7e-0d8e6bad2f3f",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });
@@ -466,13 +439,6 @@ namespace Meet.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Meet.Models.CarMeet", "carMeet")
-                        .WithMany()
-                        .HasForeignKey("carMeetMeetId");
-                });
-
-            modelBuilder.Entity("Meet.Models.Comment", b =>
-                {
                     b.HasOne("Meet.Models.CarMeet", "carMeet")
                         .WithMany()
                         .HasForeignKey("carMeetMeetId");

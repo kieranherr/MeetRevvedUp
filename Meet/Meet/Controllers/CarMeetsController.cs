@@ -52,7 +52,52 @@ namespace Meet.Controllers
             }
             return View(clients);
         }
+        public async Task<IActionResult> CommentIndex(int? id)
+        {
+            var comments = _context.Comments.Where(c => c.MeetId == id);
+            var carMeet = _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefault();
+            if (comments.Count() == 0)
+            {
+                return RedirectToAction("CommentCreate", carMeet);
+            }
+            return View(await comments.ToListAsync());
+        }
 
+        // GET: Comments/Create
+        public IActionResult CommentCreate(CarMeet carMeet, int? id)
+        {
+            Comment comment = new Comment();
+            if(carMeet.MeetId == 0)
+            {
+                comment.MeetId = (int)id;
+            }
+            else
+            {
+                comment.MeetId = carMeet.MeetId;
+            }
+            
+            return View(comment);
+        }
+
+        // POST: Comments/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CommentCreate([Bind("CommentId,CommentorsName,CommentBody,Date,MeetId")] Comment comment)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+                comment.CommentorsName = $"{client.FirstName} {client.LastName}";
+                comment.Date = DateTime.Now.ToString("M/d/yyyy");
+                _context.Add(comment);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(comment);
+        }
         // GET: CarMeets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -60,16 +105,11 @@ namespace Meet.Controllers
             {
                 return NotFound();
             }
-     
             var carMeet = await _context.CarMeets.FirstOrDefaultAsync(m => m.MeetId == id);
             if (carMeet == null)
             {
                 return NotFound();
             }
-           
-
-            
-
             return View(carMeet);
         }
 

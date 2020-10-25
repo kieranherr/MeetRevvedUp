@@ -1,14 +1,14 @@
 ﻿@model IEnumerable<Meet.Models.CarMeet>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Meets";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Meets</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a type="button" class="btn btn-primary" asp-action="Create">Create A New Meet</a>
 </p>
 <table class="table">
     <thead>
@@ -65,7 +65,7 @@
                     @Html.DisplayFor(modelItem => item.MeetDate)
                 </td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.MeetId">Details</a> 
+                    <a type="button" asp-action="Details" asp-route-id="@item.MeetId" class="btn btn-primary">Details</a>
                 </td>
             </tr>
         }
@@ -170,7 +170,6 @@
         center: myLatLng,
     });
         var meets = @Html.Raw(Json.Serialize(Model));
-        console.log(meets)
     if(meets.length != 0)
     {
         for (let i = 0; i < meets.length; i++) {
