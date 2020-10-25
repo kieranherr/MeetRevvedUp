@@ -32,6 +32,9 @@ namespace Meet.Migrations
                     b.Property<string>("IdentityUserId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ImageLocation")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Make")
                         .HasColumnType("nvarchar(max)");
 
@@ -261,8 +264,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "77c29ff4-e6a3-4210-a3ab-8f4fa47c5111",
-                            ConcurrencyStamp = "d4e69429-1fcb-4a91-af33-51c2be9d1d6f",
+                            Id = "0703d6c6-2d1c-490a-aae7-e0dbfc34b3d8",
+                            ConcurrencyStamp = "387ba68e-926c-441b-8a6d-c5c47b8eb511",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });

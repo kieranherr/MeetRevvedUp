@@ -26,8 +26,8 @@ namespace Meet.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-            var garage = _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefault();
+            var client = await _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
+            var garage = await _context.Garages.FindAsync(client.ClientId);
             if(garage == null)
             {
                 return RedirectToAction("Create");
@@ -35,12 +35,7 @@ namespace Meet.Controllers
                 return View("Details", client);
         }
 
-        // GET: Garages/Details/5
-        public async Task<IActionResult> Details()
-        {
-
-            return View();
-        }
+       
 
         // GET: Garages/Create
         public IActionResult Create()
@@ -58,7 +53,7 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCar([Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating")] Car car)
+        public async Task<IActionResult> CreateCar([Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,ImageLocation,AvgRating")] Car car)
         {
             if (ModelState.IsValid)
             {

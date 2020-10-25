@@ -26,7 +26,7 @@ namespace Meet.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var client = await _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
             if (client == null)
             {
                 return RedirectToAction("Create");
@@ -36,7 +36,7 @@ namespace Meet.Controllers
         public async Task<IActionResult> FriendIndex()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            var client = await _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
             List<Client> clients = new List<Client>();
             var friends = _context.Friends.Where(f => f.FriendOneId == client.ClientId);
             foreach(var item in friends)

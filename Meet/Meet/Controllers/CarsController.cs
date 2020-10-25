@@ -30,8 +30,8 @@ namespace Meet.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var car = _context.Cars.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-            var garage = _context.Garages.Where(g => g.CarId == car.CarId).FirstOrDefault();
+            var car = await _context.Cars.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
+            var garage = await _context.Garages.FindAsync(car.CarId);
  
             if(garage.Car == null)
             {
@@ -47,9 +47,9 @@ namespace Meet.Controllers
             List<Car> cars = new List<Car>();
             foreach (var item in clientMeets)
             {
-                var clients = _context.Clients.Where(c => c.ClientId == item.ClientId);
-                var garage = _context.Garages.Where(g => g.ClientId == item.ClientId).FirstOrDefault();
-                var car = _context.Cars.Where(c => c.CarId == garage.CarId).FirstOrDefault();
+                var clients =  _context.Clients.Where(c => c.ClientId == item.ClientId);
+                var garage = await _context.Garages.FindAsync(item.ClientId); 
+                var car =  await _context.Cars.FindAsync(garage.CarId); 
                 cars.Add(car);
             }
             List<Car> topThree = new List<Car>();
@@ -132,7 +132,7 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CarRate(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating,IdentityUserId")] Car car, int newRate)
+        public async Task<IActionResult> CarRate(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating,ImageLocation,IdentityUserId")] Car car, int newRate)
         {
             if (id != car.CarId)
             {
@@ -143,7 +143,8 @@ namespace Meet.Controllers
             {
                 try
                 {
-             
+                    var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    car.IdentityUserId = userId;
                     car.AvgRating = (newRate + car.AvgRating) / 2;
                     _context.Update(car);
                     await _context.SaveChangesAsync();
@@ -234,7 +235,7 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating")] Car car)
+        public async Task<IActionResult> Edit(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,ImageLocation,AvgRating")] Car car)
         {
             if (id != car.CarId)
             {
@@ -245,6 +246,8 @@ namespace Meet.Controllers
             {
                 try
                 {
+                    var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    car.IdentityUserId = userId;
                     _context.Update(car);
                     await _context.SaveChangesAsync();
                 }

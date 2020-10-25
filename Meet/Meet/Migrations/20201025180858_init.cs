@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Meet.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -206,6 +206,7 @@ namespace Meet.Migrations
                     Year = table.Column<int>(nullable: false),
                     Mileage = table.Column<int>(nullable: false),
                     Mods = table.Column<string>(nullable: true),
+                    ImageLocation = table.Column<string>(nullable: true),
                     AvgRating = table.Column<int>(nullable: false),
                     IdentityUserId = table.Column<string>(nullable: true)
                 },
@@ -241,6 +242,29 @@ namespace Meet.Migrations
                         column: x => x.IdentityUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    CommentId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CommentorsName = table.Column<string>(nullable: true),
+                    CommentBody = table.Column<string>(nullable: true),
+                    Date = table.Column<string>(nullable: true),
+                    MeetId = table.Column<int>(nullable: false),
+                    carMeetMeetId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.CommentId);
+                    table.ForeignKey(
+                        name: "FK_Comments_CarMeets_carMeetMeetId",
+                        column: x => x.carMeetMeetId,
+                        principalTable: "CarMeets",
+                        principalColumn: "MeetId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -307,7 +331,7 @@ namespace Meet.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "3d0c5be5-4fa8-47d9-97df-a094fe5435b5", "2a34968e-2cc2-42cb-840a-7703930b9859", "CarGuy", "CARGUY" });
+                values: new object[] { "0703d6c6-2d1c-490a-aae7-e0dbfc34b3d8", "387ba68e-926c-441b-8a6d-c5c47b8eb511", "CarGuy", "CARGUY" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -374,6 +398,11 @@ namespace Meet.Migrations
                 column: "IdentityUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_carMeetMeetId",
+                table: "Comments",
+                column: "carMeetMeetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Garages_CarId",
                 table: "Garages",
                 column: "CarId");
@@ -408,6 +437,9 @@ namespace Meet.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClientMeets");
+
+            migrationBuilder.DropTable(
+                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "Friends");

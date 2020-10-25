@@ -36,7 +36,7 @@ namespace Meet.Controllers
             var applicationDbContext = _context.CarMeets;
             return View(await applicationDbContext.ToListAsync());
         }
-        public async Task<IActionResult> RSVPIndex(int? id)
+        public IActionResult RSVPIndex(int? id)
         {
 
             var rsvps = _context.ClientMeets.Where(c => c.MeetId == id);
@@ -45,7 +45,7 @@ namespace Meet.Controllers
                 return RedirectToAction("Index");
             }
             List<Client> clients = new List<Client>();
-            foreach(var item in rsvps)
+            foreach (var item in rsvps)
             {
                 var client = _context.Clients.Where(c => c.ClientId == item.ClientId).FirstOrDefault();
                 clients.Add(client);
@@ -158,7 +158,7 @@ namespace Meet.Controllers
             }
 
 
-            var carMeet =  _context.CarMeets.FindAsync(id);
+            var carMeet = await _context.CarMeets.FindAsync(id);
             if (carMeet == null)
             {
                 return NotFound();
@@ -236,7 +236,7 @@ namespace Meet.Controllers
             {
                 return NotFound();
             }
-            var carMeet = _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefault();
+            var carMeet = await _context.CarMeets.FindAsync(id);
 
            
             return View(carMeet);
