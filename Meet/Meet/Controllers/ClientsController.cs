@@ -80,8 +80,40 @@ namespace Meet.Controllers
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", client.IdentityUserId);
             return View(client);
         }
+        // GET: Clients/Create
+        public IActionResult AddFriend(int? id)
+        {
+           if(id == null)
+            {
+                return NotFound();
+            }
+            Friend friend = new Friend();
+            friend.FriendTwoId = (int)id;
 
-        // GET: Clients/Edit/5
+            return View(friend);
+        }
+
+        // POST: Clients/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddFriend([Bind("FriendId,FriendTwoId")] Friend friend)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+                friend.FriendOneId = client.ClientId;
+
+                _context.Friends.Add(friend);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());
+            }
+            
+            return View();
+        }
+        //GET: Clients/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -103,7 +135,7 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City,IdentityUserId")] Client client)
+        public async Task<IActionResult> Edit(int id, [Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City")] Client client)
         {
             if (id != client.ClientId)
             {
@@ -114,6 +146,8 @@ namespace Meet.Controllers
             {
                 try
                 {
+                    var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    client.IdentityUserId = userId;
                     _context.Update(client);
                     await _context.SaveChangesAsync();
                 }

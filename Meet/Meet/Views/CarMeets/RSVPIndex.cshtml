@@ -42,7 +42,8 @@
                 @Html.DisplayFor(modelItem => item.City)
             </td>
             <td>
-                <a asp-action="ClientDetails" asp-controller="Cars" asp-route-id="@item.ClientId">Details</a>
+                <a type="button" asp-controller="Cars" asp-action="ClientDetails" asp-route-id="@item.ClientId"class="btn btn-primary">View Car</a>
+                <a type="button" asp-controller="Clients" asp-action="AddFriend" asp-route-id="@item.ClientId" class="btn btn-primary">Add Friend?</a>
             </td>
         </tr>
         }
