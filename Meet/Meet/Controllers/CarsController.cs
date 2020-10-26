@@ -143,8 +143,7 @@ namespace Meet.Controllers
             {
                 try
                 {
-                    var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier); 
-                    car.IdentityUserId = userId;
+
                     car.AvgRating = Convert.ToInt32( (newRate + car.AvgRating) / 2);
                     _context.Update(car);
                     await _context.SaveChangesAsync();
