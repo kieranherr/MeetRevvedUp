@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -170,7 +170,9 @@ namespace Meet.Controllers
         );
                 return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());
             }
-            return View(car);
+            else {
+                return View(car); }
+           
         }
         // GET: Cars/Details/5 
         public async Task<IActionResult> Details(int? id)

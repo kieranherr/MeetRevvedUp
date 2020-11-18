@@ -11,10 +11,12 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace Meet.Controllers
 {
-    [Authorize(Roles ="CarGuy")]
+    [Authorize(Roles = "CarGuy")]
     public class CarMeetsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -36,6 +38,29 @@ namespace Meet.Controllers
             var applicationDbContext = _context.CarMeets;
             return View(await applicationDbContext.ToListAsync());
         }
+        public IActionResult SOS(int? id)
+        {
+            var meet = _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefault();
+            if (id != null)
+            {
+                TwilioClient.Init(APIKeys.TwilioAccountSid, APIKeys.TwilioAuthToken);
+                var clientMeet = _context.ClientMeets.Where(c => c.MeetId == id);
+                
+                foreach(var item in clientMeet)
+                {
+                    var tempClient = _context.Clients.Where(c => c.ClientId == item.ClientId).FirstOrDefault();
+                    var message = MessageResource.Create(
+                                body: $"There are police at {meet.MeetName}.",
+                                from: new Twilio.Types.PhoneNumber("+12513519207"),
+                                to: new Twilio.Types.PhoneNumber($"+1{tempClient.PhoneNumber}")
+                            );
+                }
+                return View("Details", meet);
+                
+            }
+            return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());
+        }
+    
         public IActionResult RSVPIndex(int? id)
         {
 
