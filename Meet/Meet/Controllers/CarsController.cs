@@ -31,12 +31,13 @@ namespace Meet.Controllers
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var car = await _context.Cars.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
-            var garage = await _context.Garages.FindAsync(car.CarId);
- 
-            if(garage.Car == null)
+            if(car == null)
             {
                 return RedirectToAction("Create");
             }
+            var garage = await _context.Garages.FindAsync(car.CarId);
+ 
+           
             
            
             return View(garage.Car);
