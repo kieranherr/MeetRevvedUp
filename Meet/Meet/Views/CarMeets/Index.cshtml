@@ -161,10 +161,20 @@
         width: 345px;
     }
 </style>
-
+{ lat: 43.0389, lng: -87.9065 };
 <script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        }
+        else { x.innerHTML = "Geolocation is not supported by this browser."; }
+    }
+    function showPosition(position) {
+        var latlondata = {position.coords.latitude,position.coords.longitude};
+    }
+    window.alert(getLocation())
     function initMap() {
-    var myLatLng = { lat: 43.0389, lng: -87.9065 };
+    var myLatLng = getLocation()
     const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 11,
         center: myLatLng,

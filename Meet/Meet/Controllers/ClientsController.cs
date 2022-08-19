@@ -9,6 +9,8 @@ using Meet.Data;
 using Meet.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 namespace Meet.Controllers
 {
@@ -82,6 +84,16 @@ namespace Meet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City")] Client client)
         {
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={client.City}&key={APIKeys.GoogleApiKey}";
+            HttpClient clientHttp = new HttpClient();
+            HttpResponseMessage response = await clientHttp.GetAsync(url);
+            string jsonResult = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                JObject geoCode = JObject.Parse(jsonResult);
+                client.Lat = (double)geoCode["results"][0]["geometry"]["location"]["lat"];
+                client.Long = (double)geoCode["results"][0]["geometry"]["location"]["lng"];
+            }
             if (ModelState.IsValid)
             {
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
