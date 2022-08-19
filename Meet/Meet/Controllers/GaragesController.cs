@@ -27,7 +27,7 @@ namespace Meet.Controllers
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var client = await _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
-            var garage = await _context.Garages.FindAsync(client.ClientId);
+            var garage = await _context.Garages.Where(g => g.ClientId == client.ClientId).FirstOrDefaultAsync();
             if(garage == null)
             {
                 return RedirectToAction("Create");

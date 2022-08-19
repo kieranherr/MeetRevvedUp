@@ -51,7 +51,7 @@ namespace Meet.Controllers
                     var tempClient = _context.Clients.Where(c => c.ClientId == item.ClientId).FirstOrDefault();
                     var message = MessageResource.Create(
                                 body: $"There are police at {meet.MeetName}.",
-                                from: new Twilio.Types.PhoneNumber("+12513519207"),
+                                from: new Twilio.Types.PhoneNumber("+12137994915"),
                                 to: new Twilio.Types.PhoneNumber($"+1{tempClient.PhoneNumber}")
                             );
                 }
@@ -151,7 +151,7 @@ namespace Meet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MeetId,MeetName,Street,City,State,Zip,MeetTime,MeetDate")] CarMeet carMeet)
         {
-            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={carMeet.Street},+{carMeet.City},+{carMeet.State}&key={APIKeys.GeocodeKey}";
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={carMeet.Street},+{carMeet.City},+{carMeet.State}&key={APIKeys.GoogleApiKey}";
             HttpClient client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(url);
             string jsonResult = await response.Content.ReadAsStringAsync();
