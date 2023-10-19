@@ -72,7 +72,7 @@
     </tbody>
 </table>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=@Meet.APIKeys.GoogleApiKey&callback=initMap&libraries=&v=weekly"
+<script src="https://maps.googleapis.com/maps/api/js?key=@Meet.ApiKeys.GoogleApiKey&callback=initMap&libraries=&v=weekly"
         defer></script>
 <style type="text/css">
     /* Always set the map height explicitly to define the size of the div
@@ -163,8 +163,20 @@
 </style>
 
 <script>
+    // function getUser() {
+    //     const userAction = async () => {
+    //         const response = await fetch('https://localhost:44382/clients/api/ClientsAPIControler/' + @User.Identities.ToList()[0].Claims.ToList()[0].Value.ToString(););
+    //         const myJson = await response.json(); //extract JSON from the http response
+    //         console.log('help', myJson);
+    //         // do something with myJson
+    //     }
+    // }
+
+
     function initMap() {
-        var myLatLng = { lat: 36.0023, lng: -78.8979 };
+        var myLatLng = { lat: 35.227085, lng: -80.843124 };
+       
+       console.log('latlng', myLatLng)
     const map = new google.maps.Map(document.getElementById("map"), {
         zoom: 11,
         center: myLatLng,

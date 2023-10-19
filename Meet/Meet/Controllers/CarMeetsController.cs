@@ -13,6 +13,9 @@ using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+using Meet.ViewModels;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Meet.Controllers
 {
@@ -43,7 +46,7 @@ namespace Meet.Controllers
             var meet = _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefault();
             if (id != null)
             {
-                TwilioClient.Init(APIKeys.TwilioAccountSid, APIKeys.TwilioAuthToken);
+               TwilioClient.Init(ApiKeys.TwilioAccountSid, ApiKeys.TwilioAuthToken);
                 var clientMeet = _context.ClientMeets.Where(c => c.MeetId == id);
                 
                 foreach(var item in clientMeet)
@@ -51,7 +54,7 @@ namespace Meet.Controllers
                     var tempClient = _context.Clients.Where(c => c.ClientId == item.ClientId).FirstOrDefault();
                     var message = MessageResource.Create(
                                 body: $"There are police at {meet.MeetName}.",
-                                from: new Twilio.Types.PhoneNumber("+12137994915"),
+                                from: new Twilio.Types.PhoneNumber(ApiKeys.TwilioPhoneNumber),
                                 to: new Twilio.Types.PhoneNumber($"+1{tempClient.PhoneNumber}")
                             );
                 }
@@ -69,10 +72,31 @@ namespace Meet.Controllers
             {
                 return RedirectToAction("Index");
             }
-            List<Client> clients = new List<Client>();
+            List<RSVPClient> clients = new List<RSVPClient>();
+            Dictionary<int,bool> cars = new Dictionary<int,bool>();
             foreach (var item in rsvps)
             {
-                var client = _context.Clients.Where(c => c.ClientId == item.ClientId).FirstOrDefault();
+                var client = _context.Clients.Where(c => c.ClientId == item.ClientId).Select(x => new RSVPClient
+                {
+                    Age = x.Age,
+                    City = x.City,
+                    ClientId = x.ClientId,
+                    IdentityUser = x.IdentityUser,
+                    IdentityUserId = x.IdentityUserId,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    PhoneNumber = x.PhoneNumber,
+                    MeetId = item.MeetId,
+                }).FirstOrDefault();
+                var car = _context.Cars.Where(c => c.IdentityUserId == client.IdentityUserId).FirstOrDefault();
+                if(car != null)
+                {
+                    client.HasCar = true;
+                }
+                else
+                {
+                    client.HasCar = false;
+                }
                 clients.Add(client);
             }
             return View(clients);
@@ -124,13 +148,32 @@ namespace Meet.Controllers
             return View(comment);
         }
         // GET: CarMeets/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
+            var name = User.Identity.Name.Split(' ');
+
+            var currentUser = await _context.Clients.Where(x => x.FirstName == name[0] && x.LastName == name[1]).FirstOrDefaultAsync();
             if (id == null)
             {
                 return NotFound();
             }
-            var carMeet = await _context.CarMeets.FirstOrDefaultAsync(m => m.MeetId == id);
+            var carMeet = await _context.CarMeets.Where(x => x.MeetId == id).Select(x => new CarMeetIndividual
+            {
+                MeetDate = x.MeetDate,
+                MeetId = x.MeetId,
+                MeetName = x.MeetName,
+                MeetTime = x.MeetTime,
+                City = x.City,
+                CurrentUserId = currentUser.ClientId,
+                State = x.State,
+                Street = x.Street,
+                Zip = x.Zip,
+                IsRSVP = false,
+            }).FirstOrDefaultAsync();
+            var clientMeet = await _context.ClientMeets.Where(x => x.MeetId == carMeet.MeetId && x.ClientId == currentUser.ClientId).FirstOrDefaultAsync();
+            
+            if(clientMeet != null) { carMeet.IsRSVP = true; }
+
             if (carMeet == null)
             {
                 return NotFound();
@@ -151,7 +194,7 @@ namespace Meet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MeetId,MeetName,Street,City,State,Zip,MeetTime,MeetDate")] CarMeet carMeet)
         {
-            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={carMeet.Street},+{carMeet.City},+{carMeet.State}&key={APIKeys.GoogleApiKey}";
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={carMeet.Street},+{carMeet.City},+{carMeet.State}&key={ApiKeys.GoogleApiKey}";
             HttpClient client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(url);
             string jsonResult = await response.Content.ReadAsStringAsync();
@@ -166,7 +209,7 @@ namespace Meet.Controllers
                 List<Client> clients = new List<Client>();
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 carMeet.IdentityUserId = userId;
-               
+
                 _context.Add(carMeet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -266,18 +309,63 @@ namespace Meet.Controllers
            
             return View(carMeet);
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RSVP(CarMeet carMeet)
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetRSVP(int id)
         {
-            carMeet = _context.CarMeets.Where(c => c.MeetId == carMeet.MeetId).FirstOrDefault();
+            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).Select(x => new CarMeetIndividual
+            {
+                MeetDate = x.MeetDate,
+                MeetId = x.MeetId,
+                MeetName = x.MeetName,
+                MeetTime = x.MeetTime,
+                City = x.City,
+                State = x.State,
+                Street = x.Street,
+                Zip = x.Zip,
+            }).FirstOrDefaultAsync();
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             ClientMeet clientMeet = new ClientMeet();
             var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
             clientMeet.ClientId = client.ClientId;
             clientMeet.MeetId = carMeet.MeetId;
-            _context.ClientMeets.Add(clientMeet);
-            await _context.SaveChangesAsync();
+            carMeet.CurrentUserId = client.ClientId;
+            var existingRSVP =  _context.ClientMeets.Where(x => x.ClientId == clientMeet.ClientId && x.MeetId == clientMeet.MeetId).FirstOrDefault();
+            if (existingRSVP == null)
+            {
+                carMeet.IsRSVP = true;
+                _context.ClientMeets.Add(clientMeet);
+                await _context.SaveChangesAsync();
+            }
+            return View("Details", carMeet);
+        }
+
+        public async Task<IActionResult> DeleteRSVP(int id)
+        {
+            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).Select(x => new CarMeetIndividual
+            {
+                MeetDate = x.MeetDate,
+                MeetId = x.MeetId,
+                MeetName = x.MeetName,
+                MeetTime = x.MeetTime,
+                City = x.City,
+                State = x.State,
+                Street = x.Street,
+                Zip = x.Zip,
+            }).FirstOrDefaultAsync();
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ClientMeet clientMeet = new ClientMeet();
+            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+            clientMeet.ClientId = client.ClientId;
+            clientMeet.MeetId = carMeet.MeetId;
+            carMeet.CurrentUserId = client.ClientId;
+            var existingRSVP = _context.ClientMeets.Where(x => x.ClientId == clientMeet.ClientId && x.MeetId == clientMeet.MeetId).FirstOrDefault();
+            if (existingRSVP != null)
+            {
+                carMeet.IsRSVP = false;
+                _context.ClientMeets.Remove(existingRSVP);
+                await _context.SaveChangesAsync();
+            }
             return View("Details", carMeet);
         }
         private bool CarMeetExists(int id)

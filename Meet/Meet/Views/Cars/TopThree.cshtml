@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Meet.Models.Car>
+﻿@model IEnumerable<Meet.ViewModels.CarMeetCar>
 
 @{
     ViewData["Title"] = "TopThree";
@@ -10,9 +10,6 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Vin)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Make)
             </th>
@@ -38,32 +35,30 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Vin)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Make)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Model)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Year)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Mileage)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Mods)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AvgRating)
-                </td>
-
-
-            </tr>
+            @if(item.Make != null)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Make)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Model)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Year)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Mileage)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Mods)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AvgRating)
+                    </td>
+                </tr>
+            }
         }
     </tbody>
 </table>
-<a type="button" asp-action="Index" asp-controller="CarMeets" class="btn btn-primary">Back To The Meets</a>
+<a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.FirstOrDefault().MeetId" class="btn btn-primary">Back To The Meet</a>

@@ -1,4 +1,6 @@
-﻿@model IEnumerable<Meet.Models.Client>
+﻿@model IEnumerable<Meet.ViewModels.RSVPClient>
+
+
 
 @{
     ViewData["Title"] = "Index";
@@ -42,11 +44,20 @@
                 @Html.DisplayFor(modelItem => item.City)
             </td>
             <td>
-                <a type="button" asp-controller="Cars" asp-action="ClientDetails" asp-route-id="@item.ClientId"class="btn btn-primary">View Car</a>
+
+                    @if (item.HasCar)
+                    {
+                        <a type="button" asp-controller="Cars" asp-action="ClientDetails" asp-route-id="@item.ClientId" class="btn btn-primary">View Car</a>
+                    }
+                    else
+                    {
+                        <a type="button" style="pointer-events: none" class="btn btn-warning">No Car</a>
+                    }
+
                 <a type="button" asp-controller="Clients" asp-action="AddFriend" asp-route-id="@item.ClientId" class="btn btn-primary">Add Friend</a>
             </td>
         </tr>
         }
     </tbody>
 </table>
-<a type="button" asp-action="Index" class="btn btn-primary">Back To The Meets</a>
+<a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.FirstOrDefault().MeetId" class="btn btn-primary">Back To The Meet</a>

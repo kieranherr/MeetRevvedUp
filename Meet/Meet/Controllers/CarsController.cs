@@ -13,6 +13,8 @@ using System.Reflection.Metadata.Ecma335;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 using Microsoft.AspNetCore.Razor.Hosting;
+using MessagePack.Formatters;
+using Meet.ViewModels;
 
 namespace Meet.Controllers
 {
@@ -42,21 +44,37 @@ namespace Meet.Controllers
            
             return View(garage.Car);
         }
-        public async Task<IActionResult> TopThree(int? id)
+
+
+
+        public async Task<IActionResult> TopThree(int id)
         {
             var clientMeets = _context.ClientMeets.Where(c => c.MeetId == id);
-            List<Car> cars = new List<Car>();
+            List<CarMeetCar> cars = new List<CarMeetCar>();
             foreach (var item in clientMeets)
             {
                 var clients =  _context.Clients.Where(c => c.ClientId == item.ClientId);
                 var garage = await _context.Garages.FindAsync(item.ClientId); 
-                var car =  await _context.Cars.FindAsync(garage.CarId); 
-                cars.Add(car);
+                if(garage != null)
+                {
+                    var car = await _context.Cars.Where(x => x.CarId == garage.CarId).Select(x => new CarMeetCar
+                    {
+                        Make = x.Make,
+                        Model = x.Model,
+                        Year = x.Year,
+                        CarId = x.CarId,
+                        Mileage = x.Mileage,
+                        AvgRating = x.AvgRating,
+                        Mods = x.Mods,
+                        MeetId = id,
+                    }).FirstOrDefaultAsync();
+                    cars.Add(car);
+                }
             }
-            List<Car> topThree = new List<Car>();
-            var carOne = new Car();
-            var carTwo = new Car();
-            var carThree = new Car();
+            List<CarMeetCar> topThree = new List<CarMeetCar>();
+            var carOne = new CarMeetCar();
+            var carTwo = new CarMeetCar();
+            var carThree = new CarMeetCar();
             carOne.AvgRating = 0;
             carTwo.AvgRating = 0;
             carThree.AvgRating = 0;
@@ -135,12 +153,14 @@ namespace Meet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CarRate(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating,ImageLocation,IdentityUserId")] Car car, int newRate)
         {
+            var user = await _context.Clients.Where(x => x.IdentityUserId == car.IdentityUserId).FirstOrDefaultAsync();
+            var meet =  _context.CarMeets.Where(x => x.MeetId == _context.ClientMeets.Where(y => y.ClientId == user.ClientId).FirstOrDefault().MeetId).FirstOrDefault();
             if (id != car.CarId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) 
             {
                 try
                 {
@@ -160,13 +180,14 @@ namespace Meet.Controllers
                         throw;
                     }
                 }
-                TwilioClient.Init(APIKeys.TwilioAccountSid, APIKeys.TwilioAuthToken);
+                TwilioClient.Init(ApiKeys.TwilioAccountSid, ApiKeys.TwilioAuthToken);
                 var garage = _context.Garages.Where(c => c.CarId == id).FirstOrDefault();
                 var client = _context.Clients.Where(c => c.ClientId == garage.ClientId).FirstOrDefault();
-
+                var phoneNumber = ApiKeys.TwilioPhoneNumber;
                 var message = MessageResource.Create(
-            body: $"Your {car.Year} {car.Make} {car.Model} was just rated at a Meet! Check it out!",
-            from: new Twilio.Types.PhoneNumber("+12513519207"),
+            body: $"Hi {user.FirstName}! " +
+            $"Your {car.Year} {car.Make} {car.Model} was just rated at {meet.MeetName} in {meet.City}! Check it out!",
+            from: new Twilio.Types.PhoneNumber(phoneNumber),
             to: new Twilio.Types.PhoneNumber("+1"+client.PhoneNumber.ToString())
         );
                 return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());

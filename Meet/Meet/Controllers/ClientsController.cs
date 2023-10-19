@@ -9,6 +9,7 @@ using Meet.Data;
 using Meet.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Meet.Controllers
 {
@@ -88,6 +89,13 @@ namespace Meet.Controllers
                 client.IdentityUserId = userId;
                 _context.Add(client);
                 await _context.SaveChangesAsync();
+                IdentityUser test = _context.Users.Where(x => x.Id == userId).FirstOrDefault();
+                var help = test.UserName = client.FirstName + " " + client.LastName;
+                test.UserName = help;
+                test.NormalizedUserName = help.ToUpper();
+                _context.Users.Attach(test);   
+                _context.Entry(test).State = EntityState.Modified;
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", client.IdentityUserId);
