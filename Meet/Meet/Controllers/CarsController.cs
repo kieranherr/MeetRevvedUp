@@ -109,10 +109,12 @@ namespace Meet.Controllers
                     }
                     
             }
-            topThree.Add(carOne);
-            topThree.Add(carTwo);
-            topThree.Add(carThree);
-            
+            if(carOne.CarId != 0) { topThree.Add(carOne); }
+            if(carTwo.CarId != 0) { topThree.Add(carTwo); }
+            if(carThree.CarId != 0) { topThree.Add(carThree); }
+
+            if(carOne.CarId == 0 && carOne.MeetId == 0) { carOne.MeetId = id; topThree.Add(carOne); }
+
             return View(topThree);
         }
         public async Task<IActionResult> ClientDetails(int? id)
@@ -154,7 +156,8 @@ namespace Meet.Controllers
         public async Task<IActionResult> CarRate(int id, [Bind("CarId,Vin,Make,Model,Year,Mileage,Mods,AvgRating,ImageLocation,IdentityUserId")] Car car, int newRate)
         {
             var user = await _context.Clients.Where(x => x.IdentityUserId == car.IdentityUserId).FirstOrDefaultAsync();
-            var meet =  _context.CarMeets.Where(x => x.MeetId == _context.ClientMeets.Where(y => y.ClientId == user.ClientId).FirstOrDefault().MeetId).FirstOrDefault();
+            var meetId = await _context.ClientMeets.Where(y => y.ClientId == user.ClientId).FirstOrDefaultAsync();
+            var meet = await _context.CarMeets.Where(x => x.MeetId == meetId.MeetId).FirstOrDefaultAsync();
             if (id != car.CarId)
             {
                 return NotFound();
@@ -190,7 +193,7 @@ namespace Meet.Controllers
             from: new Twilio.Types.PhoneNumber(phoneNumber),
             to: new Twilio.Types.PhoneNumber("+1"+client.PhoneNumber.ToString())
         );
-                return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());
+                return RedirectToAction("Details", "CarMeets", new { id = meet.MeetId });
             }
             else {
                 return View(car); }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Meet.Models.CarMeet>
+﻿@model IEnumerable<Meet.ViewModels.CarMeetListRecord>
 
 @{
     ViewData["Title"] = "Meets";
@@ -160,45 +160,66 @@
     #target {
         width: 345px;
     }
+
+    .gm-style-iw + button {
+        display: none;
+        border: none;
+    }
+
+    .gm-style-iw button:focus {
+        outline: 0;
+    }
 </style>
 
 <script>
-    // function getUser() {
-    //     const userAction = async () => {
-    //         const response = await fetch('https://localhost:44382/clients/api/ClientsAPIControler/' + @User.Identities.ToList()[0].Claims.ToList()[0].Value.ToString(););
-    //         const myJson = await response.json(); //extract JSON from the http response
-    //         console.log('help', myJson);
-    //         // do something with myJson
-    //     }
-    // }
-
-
+    function isInfoWindowOpen(infoWindow) {
+        var map = infoWindow.getMap();
+        return (map !== null && typeof map !== "undefined");
+    }
     function initMap() {
+        var meet = @Html.Raw(Json.Serialize(Model.FirstOrDefault()));
         var myLatLng = { lat: 35.227085, lng: -80.843124 };
-       
-       console.log('latlng', myLatLng)
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 11,
-        center: myLatLng,
-    });
+
+        if (meet != null) {
+            myLatLng = { lat: meet.userLat, lng: meet.userLong };
+        }
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 11,
+            center: myLatLng,
+        });
+        const infoWindow = new google.maps.InfoWindow();
         var meets = @Html.Raw(Json.Serialize(Model));
-    if(meets.length != 0)
-    {
-        for (let i = 0; i < meets.length; i++) {
-            var meet = meets[i];
-            var Latitude = meet.lat;
-            var Longitude = meet.long;
-            myLatLng = { lat: Latitude, lng: Longitude }
-            new google.maps.Marker({
-                position: myLatLng,
-                map,
-                title: meet.meetName,
-            });
+        if (meets.length != 0) {
+            for (let i = 0; i < meets.length; i++) {
+                var meet = meets[i];
+                var Latitude = meet.lat;
+                var Longitude = meet.long;
+                var label = (i + 1).toString();
+                myLatLng = { lat: Latitude, lng: Longitude }
+                const marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map,
+                    title: meet.meetName,
+                    label: label
+                });
+                marker.addListener("click", () => {
+                    if (isInfoWindowOpen(infoWindow)) {
+                        infoWindow.close();
+
+                    }
+                    else {
+                        infoWindow.close();
+                        infoWindow.setContent(marker.getTitle());
+                        infoWindow.open(marker.getMap(), marker);
+                        infoWindow.focus(marker)
+                    }
+
+                });
+            }
         }
     }
 
-
-    }
 </script>
     <body>
 

@@ -61,7 +61,7 @@ namespace Meet.Controllers
                 car.IdentityUserId = userId;
                 _context.Add(car);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Create","Garages", new Garage());
             }
             return View(car);
         }

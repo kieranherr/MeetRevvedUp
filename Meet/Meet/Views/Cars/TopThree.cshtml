@@ -6,59 +6,76 @@
 }
 
 <h1>Top Three Cars</h1>
+<style>
+    .container .jumbotron {
+        border-radius: 6px;
+    }
+</style>
+@if(Model.ElementAt(0).MeetId != 0 && Model.ElementAt(0).CarId != 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Make)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Model)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Year)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Mileage)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Mods)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AvgRating)
+                </th>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Make)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Model)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Year)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Mileage)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Mods)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AvgRating)
-            </th>
-
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            @if(item.Make != null)
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Make)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Model)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Year)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Mileage)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Mods)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.AvgRating)
-                    </td>
-                </tr>
+                @if (item.Make != null)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Make)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Model)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Year)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Mileage)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Mods)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AvgRating)
+                        </td>
+                    </tr>
+                }
             }
-        }
-    </tbody>
-</table>
-<a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.FirstOrDefault().MeetId" class="btn btn-primary">Back To The Meet</a>
+        </tbody>
+    </table>
+    <a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.FirstOrDefault().MeetId" class="btn btn-primary">Back To The Meet</a>
+}
+else
+{
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Top Three Cars</h1>
+            <p class="lead">No one with a car has RSVP'd yet.</p>
+        </div>
+    </div>
+    <a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.ElementAt(0).MeetId" class="btn btn-primary">Back To The Meet</a>
+}

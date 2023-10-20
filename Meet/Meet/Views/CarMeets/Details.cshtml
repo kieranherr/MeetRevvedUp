@@ -1,4 +1,4 @@
-﻿@model Meet.ViewModels.CarMeetIndividual
+﻿@model Meet.ViewModels.CarMeetDetails
 
 @{
     ViewData["Title"] = "About";
@@ -54,7 +54,7 @@
         </dd>
     </dl>
     <style>
-        #SOSButton{
+        #alert{
             background-color: red;
             border-color: red;
         }
@@ -71,8 +71,145 @@
 
     <a type="button" asp-action="TopThree" asp-route-id="@Model.MeetId" asp-controller="Cars" class="btn btn-primary">View The Top Three Cars Going</a>
     <a type="button" asp-action="CommentIndex" asp-route-id="@Model.MeetId" class="btn btn-primary">Comments</a>
+    <a type="button" id="alert" asp-action="SOS" asp-route-id="@Model.MeetId" class="btn btn-primary">SOS</a>
 
-    <a type="button" id="SOSButton" asp-action="SOS" asp-route-id="@Model.MeetId" class="btn btn-primary">SOS</a>
-    @* <a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.FirstOrDefault().MeetId" class="btn btn-primary">Back To The Meet</a> *@
+    @if (Model.IsOwner)
+    {
+        <a type="button" asp-action="Edit" asp-route-id="@Model.MeetId" class="btn btn-primary">Edit</a>
+        <a type="button" id="alert" asp-action="Delete" asp-route-id="@Model.MeetId" class="btn btn-primary">Delete</a>
+    }
+
 </div>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=@Meet.ApiKeys.GoogleApiKey&callback=initMap&libraries=&v=weekly"
+        defer></script>
+<style type="text/css">
+    /* Always set the map height explicitly to define the size of the div
+           * element that contains the map. */
+    #map {
+        height: 400px;
+        margin-top: 25px;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    #description {
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+    }
+
+    #infowindow-content .title {
+        font-weight: bold;
+    }
+
+    #infowindow-content {
+        display: none;
+    }
+
+    #map #infowindow-content {
+        display: inline;
+    }
+
+    .pac-card {
+        margin: 10px 10px 0 0;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        background-color: #fff;
+        font-family: Roboto;
+    }
+
+    #pac-container {
+        padding-bottom: 12px;
+        margin-right: 12px;
+    }
+
+    .pac-controls {
+        display: inline-block;
+        padding: 5px 11px;
+    }
+
+        .pac-controls label {
+            font-family: Roboto;
+            font-size: 13px;
+            font-weight: 300;
+        }
+
+    #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 400px;
+    }
+
+        #pac-input:focus {
+            border-color: #4d90fe;
+        }
+
+    #title {
+        color: #fff;
+        background-color: #4d90fe;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 6px 12px;
+    }
+
+    #target {
+        width: 345px;
+    }
+</style>
+
+<script>
+    function initMap() {
+        var meet = @Html.Raw(Json.Serialize(Model));
+        console.log(meet);
+        let localLat = meet.lat;
+        let localLng = meet.long;
+        console.log('lat',localLat)
+        var myLatLng = { lat: meet.lat, lng: meet.long };
+
+        console.log('latlng', myLatLng)
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 13,
+            center: myLatLng,
+        });
+
+        const infoWindow = new google.maps.InfoWindow();
+
+                var Latitude = meet.lat;
+                var Longitude = meet.long;
+                myLatLng = { lat: Latitude, lng: Longitude }
+               const marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map,
+                    title: meet.meetName,
+
+                });
+
+        marker.addListener("click", () => {
+            infoWindow.close();
+            infoWindow.setContent(marker.getTitle());
+            infoWindow.open(marker.getMap(), marker);
+        })
+
+    }
+</script>
+<body>
+
+    <div id="map"></div>
+</body>
+
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     

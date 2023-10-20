@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Meet.ViewModels
 {
-    public class CarMeetIndividual
+    public class CarMeetListRecord
     {
         [Key]
         public int MeetId { get; set; }
@@ -20,7 +20,11 @@ namespace Meet.ViewModels
         public string MeetTime { get; set; }
         [Display(Name = "Meet Date")]
         public string MeetDate { get; set; }
-        public int CurrentUserId { get; set; }
-        public bool IsRSVP { get; set; }
+        public double UserLat { get; set; }
+        public double UserLong { get; set; }
+
+        [ForeignKey("IdentityUser")]
+        public string IdentityUserId { get; set; }
+        public IdentityUser IdentityUser { get; set; }
     }
 }

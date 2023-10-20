@@ -16,6 +16,8 @@ using Twilio.Rest.Api.V2010.Account;
 using Meet.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using NuGet.Protocol;
+using Newtonsoft.Json;
 
 namespace Meet.Controllers
 {
@@ -32,15 +34,41 @@ namespace Meet.Controllers
         // GET: CarMeets
         public async Task<IActionResult> Index()
         {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+
+            var address = client.City.ToString() + "%20" + client.State.ToString();
+            var httpClient = new HttpClient();
+
+            using HttpResponseMessage response = await httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + $"&key={Meet.ApiKeys.GoogleApiKey}");
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+            var geocode = JsonConvert.DeserializeObject<GeocodeJson>(responseBody).Results;
 
             var carMeets = _context.CarMeets;
             if (carMeets == null)
             {
                 return RedirectToAction("Create");
             }
-            var applicationDbContext = _context.CarMeets;
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = _context.CarMeets.Where(x => x.State == client.State).Select(x => new CarMeetListRecord{
+                MeetDate = x.MeetDate,
+                MeetId = x.MeetId,
+                MeetName = x.MeetName,
+                MeetTime = x.MeetTime,
+                Lat = x.Lat, 
+                Long = x.Long,
+                City = x.City,
+                Zip = x.Zip,
+                State = x.State,
+                Street = x.Street,
+                UserLat = geocode[0].geometry.location.lat,
+                UserLong = geocode[0].geometry.location.lng,
+            });
+            var result = await applicationDbContext.ToListAsync();
+
+            return View(result);
         }
+
         public IActionResult SOS(int? id)
         {
             var meet = _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefault();
@@ -53,18 +81,18 @@ namespace Meet.Controllers
                 {
                     var tempClient = _context.Clients.Where(c => c.ClientId == item.ClientId).FirstOrDefault();
                     var message = MessageResource.Create(
-                                body: $"There are police at {meet.MeetName}.",
+                                body: $"There are police at {meet.MeetName} in {meet.City}, {meet.State.ToUpper()}.",
                                 from: new Twilio.Types.PhoneNumber(ApiKeys.TwilioPhoneNumber),
                                 to: new Twilio.Types.PhoneNumber($"+1{tempClient.PhoneNumber}")
                             );
                 }
-                return View("Details", meet);
-                
+                return RedirectToAction("Details", new { id = meet.MeetId });
+
             }
-            return RedirectToAction("Index", "CarMeets", _context.CarMeets.ToList());
+            return RedirectToAction("Details", new {id = meet.MeetId});
         }
     
-        public IActionResult RSVPIndex(int? id)
+        public IActionResult RSVPIndex(int id)
         {
 
             var rsvps = _context.ClientMeets.Where(c => c.MeetId == id);
@@ -99,17 +127,18 @@ namespace Meet.Controllers
                 }
                 clients.Add(client);
             }
+            if(clients.Count == 0) { clients.Add(new RSVPClient() { MeetId = id }); }
             return View(clients);
         }
-        public async Task<IActionResult> CommentIndex(int? id)
+        public async Task<IActionResult> CommentIndex(int id)
         {
-            var comments = _context.Comments.Where(c => c.MeetId == id);
-            var carMeet = _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefault();
+            var comments = await _context.Comments.Where(c => c.MeetId == id).ToListAsync();
+            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefaultAsync();
             if (comments.Count() == 0)
             {
-                return RedirectToAction("CommentCreate", carMeet);
+                comments.Add(new Comment() { MeetId = id });
             }
-            return View(await comments.ToListAsync());
+            return View( comments);
         }
 
         // GET: Comments/Create
@@ -150,14 +179,14 @@ namespace Meet.Controllers
         // GET: CarMeets/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var name = User.Identity.Name.Split(' ');
+            var identityId = User.Claims.ToList()[0].Value;
 
-            var currentUser = await _context.Clients.Where(x => x.FirstName == name[0] && x.LastName == name[1]).FirstOrDefaultAsync();
+            var currentUser = await _context.Clients.Where(x => x.IdentityUserId == identityId).FirstOrDefaultAsync();
             if (id == null)
             {
                 return NotFound();
             }
-            var carMeet = await _context.CarMeets.Where(x => x.MeetId == id).Select(x => new CarMeetIndividual
+            var carMeet = await _context.CarMeets.Where(x => x.MeetId == id).Select(x => new CarMeetDetails
             {
                 MeetDate = x.MeetDate,
                 MeetId = x.MeetId,
@@ -169,10 +198,16 @@ namespace Meet.Controllers
                 Street = x.Street,
                 Zip = x.Zip,
                 IsRSVP = false,
+                Lat = x.Lat,
+                Long = x.Long,
+                CreatedBy = x.IdentityUserId,
+                IsOwner = false,
             }).FirstOrDefaultAsync();
+
+            if(carMeet.CreatedBy == identityId) { carMeet.IsOwner = true; }
             var clientMeet = await _context.ClientMeets.Where(x => x.MeetId == carMeet.MeetId && x.ClientId == currentUser.ClientId).FirstOrDefaultAsync();
-            
-            if(clientMeet != null) { carMeet.IsRSVP = true; }
+
+            if (clientMeet != null) { carMeet.IsRSVP = true; }
 
             if (carMeet == null)
             {
@@ -209,12 +244,13 @@ namespace Meet.Controllers
                 List<Client> clients = new List<Client>();
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 carMeet.IdentityUserId = userId;
+                carMeet.State = carMeet.State.ToUpper();
 
                 _context.Add(carMeet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(carMeet);
+            return RedirectToAction("Details", new {id = carMeet.MeetId});
         }
 
         // GET: CarMeets/Edit/5
@@ -231,7 +267,7 @@ namespace Meet.Controllers
             {
                 return NotFound();
             }
-            return View();
+            return View(carMeet);
         }
 
         // POST: CarMeets/Edit/5
@@ -239,20 +275,33 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("")] CarMeet carMeet)
+        public async Task<IActionResult> Edit(int id, [Bind("MeetId,MeetName,Street,City,State,Zip,MeetTime,MeetDate")] CarMeet carMeet)
         {
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={carMeet.Street},+{carMeet.City},+{carMeet.State}&key={ApiKeys.GoogleApiKey}";
+            HttpClient httpClient = new HttpClient();
+            HttpResponseMessage response = await httpClient.GetAsync(url);
+            string jsonResult = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                JObject geoCode = JObject.Parse(jsonResult);
+                carMeet.Lat = (double)geoCode["results"][0]["geometry"]["location"]["lat"];
+                carMeet.Long = (double)geoCode["results"][0]["geometry"]["location"]["lng"];
+            }
+
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            carMeet = _context.CarMeets.Where(c => c.IdentityUserId == userId).FirstOrDefault();
             
             if (ModelState.IsValid)
             {
                 try
                 {
                    
-                    var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
-                    
-                    _context.Update(carMeet);
-                    await _context.SaveChangesAsync();
+                    var existingCarMeet = _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefault();
+                    carMeet.IdentityUserId = existingCarMeet.IdentityUserId;
+                    carMeet.IdentityUser = existingCarMeet.IdentityUser;
+                    carMeet.MeetId = existingCarMeet.MeetId;
+
+                    _context.Entry(existingCarMeet).CurrentValues.SetValues(carMeet);
+                    _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -265,8 +314,10 @@ namespace Meet.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction("Details", new { id = id});
             }
+           
             return View(carMeet);
         }
 
@@ -313,7 +364,7 @@ namespace Meet.Controllers
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> SetRSVP(int id)
         {
-            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).Select(x => new CarMeetIndividual
+            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).Select(x => new CarMeetDetails
             {
                 MeetDate = x.MeetDate,
                 MeetId = x.MeetId,
@@ -337,12 +388,12 @@ namespace Meet.Controllers
                 _context.ClientMeets.Add(clientMeet);
                 await _context.SaveChangesAsync();
             }
-            return View("Details", carMeet);
+            return RedirectToAction("Details", new {id = id});
         }
 
         public async Task<IActionResult> DeleteRSVP(int id)
         {
-            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).Select(x => new CarMeetIndividual
+            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).Select(x => new CarMeetDetails
             {
                 MeetDate = x.MeetDate,
                 MeetId = x.MeetId,
@@ -366,7 +417,7 @@ namespace Meet.Controllers
                 _context.ClientMeets.Remove(existingRSVP);
                 await _context.SaveChangesAsync();
             }
-            return View("Details", carMeet);
+            return RedirectToAction("Details", new { id = id });
         }
         private bool CarMeetExists(int id)
         {
