@@ -68,7 +68,7 @@
     </tbody>
 </table>
 </div>
-    <a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.FirstOrDefault().MeetId" class="btn btn-primary">Back To The Meet</a>
+    <a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.ElementAt(0).MeetId" class="btn btn-primary">Back To The Meet</a>
 }
 else
 {

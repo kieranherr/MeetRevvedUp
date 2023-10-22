@@ -172,6 +172,21 @@
 </style>
 
 <script>
+    var useBrowserLocation = false;
+    var browserCoords = {};
+    navigator.geolocation.getCurrentPosition(showPosition, positionError);
+    function showPosition(position) {
+        var coords = position.coords;
+        browserCoords = { lat: coords.latitude, lng: coords.longitude };
+        useBrowserLocation = true;
+        console.log('showposotion true', browserCoords);
+        initMap();
+    }
+    function positionError(position) {
+        console.log('showposition false')
+        useBrowserLocation = false;
+        initMap();
+    }
     function isInfoWindowOpen(infoWindow) {
         var map = infoWindow.getMap();
         return (map !== null && typeof map !== "undefined");
@@ -180,8 +195,13 @@
         var meet = @Html.Raw(Json.Serialize(Model.FirstOrDefault()));
         var myLatLng = { lat: 35.227085, lng: -80.843124 };
 
-        if (meet != null) {
-            myLatLng = { lat: meet.userLat, lng: meet.userLong };
+        if (useBrowserLocation) {
+            myLatLng = browserCoords;
+        }
+        else {
+            if (meet != null) {
+                myLatLng = { lat: meet.userLat, lng: meet.userLong };
+            }
         }
 
         const map = new google.maps.Map(document.getElementById("map"), {

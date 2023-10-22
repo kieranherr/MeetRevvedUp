@@ -20,7 +20,20 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.MeetName)
         </dd>
+        <dt class="col-sm-2">
 
+            @Html.DisplayNameFor(model => model.MeetDate)
+        </dt>
+        <dd class="col-sm-10"> 
+            @Html.DisplayFor(model => model.MeetDate)
+        </dd>
+        <dt class="col-sm-2">
+
+            @Html.DisplayNameFor(model => model.MeetTime)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MeetTime)
+        </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Street)
         </dt>
@@ -45,13 +58,7 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Zip)
         </dd>
-        <dt class="col-sm-2">
 
-            @Html.DisplayNameFor(model => model.MeetTime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.MeetTime)
-        </dd>
     </dl>
     <style>
         #alert{
