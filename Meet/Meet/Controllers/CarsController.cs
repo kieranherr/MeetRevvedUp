@@ -49,7 +49,7 @@ namespace Meet.Controllers
 
         public async Task<IActionResult> TopThree(int id)
         {
-            var clientMeets = _context.ClientMeets.Where(c => c.MeetId == id);
+            var clientMeets = _context.ClientMeets.Where(c => c.MeetId == id).ToList();
             List<CarMeetCar> cars = new List<CarMeetCar>();
             foreach (var item in clientMeets)
             {
