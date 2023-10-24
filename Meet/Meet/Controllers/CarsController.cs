@@ -53,7 +53,6 @@ namespace Meet.Controllers
             List<CarMeetCar> cars = new List<CarMeetCar>();
             foreach (var item in clientMeets)
             {
-                var clients =  _context.Clients.Where(c => c.ClientId == item.ClientId);
                 var garage = await _context.Garages.FindAsync(item.ClientId); 
                 if(garage != null)
                 {
