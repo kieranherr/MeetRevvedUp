@@ -1,48 +1,70 @@
-﻿@model IEnumerable<Meet.Models.CarMeet>
-
+﻿@model IEnumerable<Meet.ViewModels.CarMeetListRecord>
 @{
     ViewData["Title"] = "Meets";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Meets</h1>
-
-<p>
-    <a type="button" class="btn btn-primary" asp-action="Create">Create A New Meet</a>
-</p>
-<table class="table">
-    <thead>
+<style>
+    .table-hover tbody tr:hover td {
+        background: lightgray;
+    }
+    </style>
+<p id="inlineButtons">
+    <table class="table">
         <tr>
             <th>
+                <div class="input-group input-group-sm mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-sm">Want to explore Meets in a different area?</span>
+                    </div>
+                    <input type="number" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Zipcode" maxlength="5" id="zipCodeInput">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" onclick="searchByZip(document.getElementById('zipCodeInput').value)" onkeypress="searchByZip(document.getElementById('zipCodeInput').value)">Search</button>
+                    </div>
+                </div>
+            </th>
+            <th>
+                <a type="button" class="btn btn-primary btn-group-sm" asp-controller="CarMeets" asp-action="Create" >Create A New Meet</a>
+            </th>
+        </tr>
+    </table>
+    
+    
+    
+</p>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.MeetName)
             </th>
         
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.Street)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.City)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.State)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.Zip)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.MeetTime)
             </th>
-            <th>
+            <th scope="col">
                 @Html.DisplayNameFor(model => model.MeetDate)
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
+            <tr onclick="location.href = '@Url.Action("Details", "CarMeets", new { id=item.MeetId })'" title="Click to show details.">
+                <td scope="row">
                     @Html.DisplayFor(modelItem => item.MeetName)
                 </td>
              
@@ -64,16 +86,11 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.MeetDate)
                 </td>
-                <td>
-                    <a type="button" asp-action="Details" asp-route-id="@item.MeetId" class="btn btn-primary">Details</a>
-                </td>
             </tr>
         }
     </tbody>
 </table>
-<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=@Meet.ApiKeys.GoogleApiKey&callback=initMap&libraries=&v=weekly"
-        defer></script>
+
 <style type="text/css">
     /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -160,44 +177,145 @@
     #target {
         width: 345px;
     }
-</style>
 
-<script>
-    // function getUser() {
-    //     const userAction = async () => {
-    //         const response = await fetch('https://localhost:44382/clients/api/ClientsAPIControler/' + @User.Identities.ToList()[0].Claims.ToList()[0].Value.ToString(););
-    //         const myJson = await response.json(); //extract JSON from the http response
-    //         console.log('help', myJson);
-    //         // do something with myJson
-    //     }
-    // }
-
-
-    function initMap() {
-        var myLatLng = { lat: 35.227085, lng: -80.843124 };
-       
-       console.log('latlng', myLatLng)
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 11,
-        center: myLatLng,
-    });
-        var meets = @Html.Raw(Json.Serialize(Model));
-    if(meets.length != 0)
-    {
-        for (let i = 0; i < meets.length; i++) {
-            var meet = meets[i];
-            var Latitude = meet.lat;
-            var Longitude = meet.long;
-            myLatLng = { lat: Latitude, lng: Longitude }
-            new google.maps.Marker({
-                position: myLatLng,
-                map,
-                title: meet.meetName,
-            });
-        }
+    .gm-style-iw + button {
+        display: none;
+        border: none;
     }
 
+    .gm-style-iw button:focus {
+        outline: 0;
+    }
+</style>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script async="false" type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=@Meet.ApiKeys.GoogleApiKey&callback=initMap&libraries=&v=weekly"></script>
 
+<script>
+
+    var myLatLng = { lat: 35.227085, lng: -80.843124 };
+    var useBrowserLocation = false;
+    var zipState = '';
+    var useSearchByZip = false;
+    var browserCoords = {};
+    navigator.geolocation.getCurrentPosition(showPosition, positionError);
+    function showPosition(position) {
+        var coords = position.coords;
+        browserCoords = { lat: coords.latitude, lng: coords.longitude };
+        useBrowserLocation = true;
+        console.log('showposotion true', browserCoords);
+        initMap();
+    }
+    function positionError(position) {
+        console.log('showposition false')
+        useBrowserLocation = false;
+        initMap();
+    }
+    function isInfoWindowOpen(infoWindow) {
+        var map = infoWindow.getMap();
+        return (map !== null && typeof map !== "undefined");
+    }
+
+    function searchByZip(zipCode) {
+        console.log('zip', zipCode)
+        document.getElementById('zipCodeInput').value = ""
+        geocoder.geocode({ 'address': zipCode.toString() }, function (results, status) {
+            if (status == 'OK') {
+                console.log('help results', results, zipCode)
+                myLatLng = { lat: results[0].geometry.location.lat(), lng: results[0].geometry.location.lng()}
+                // zipState = results[0].address_components[3].short_name.toString();
+                console.log('lat lnmg', myLatLng, zipState)
+                useSearchByZip = true;
+                initMap();
+            } else {
+                alert('Geocode was not successful for the following reason: ' + status);
+            }
+        });
+    }
+
+    function initMap() {
+        if (google) {
+            geocoder = new google.maps.Geocoder();
+        }
+        var meet = @Html.Raw(Json.Serialize(Model.FirstOrDefault()));
+
+
+        if (!useSearchByZip) {
+            if (useBrowserLocation) {
+                myLatLng = browserCoords;
+            }
+            else {
+                if (meet != null) {
+                    console.log('hit')
+                    myLatLng = { lat: meet.userLat, lng: meet.userLong };
+                }
+            }
+        }
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 11,
+            center: myLatLng,
+        });
+        const infoWindow = new google.maps.InfoWindow();
+ 
+        var meets = @Html.Raw(Json.Serialize(Model));
+        if (meets.length != 0) {
+            for (let i = 0; i < meets.length; i++) {
+                var meet = meets[i];
+                // if (useSearchByZip) {
+                //     if (meet.state == zipState) {
+                //         var Latitude = meet.lat;
+                //         var Longitude = meet.long;
+                //         var label = (i + 1).toString();
+                //         myLatLng = { lat: Latitude, lng: Longitude }
+                //         const marker = new google.maps.Marker({
+                //             position: myLatLng,
+                //             map,
+                //             title: meet.meetName,
+                //             label: label
+                //         });
+                //         marker.addListener("click", () => {
+                //             if (isInfoWindowOpen(infoWindow)) {
+                //                 infoWindow.close();
+
+                //             }
+                //             else {
+                //                 infoWindow.close();
+                //                 infoWindow.setContent(marker.getTitle());
+                //                 infoWindow.open(marker.getMap(), marker);
+                //                 infoWindow.focus(marker)
+                //             }
+
+                //         });
+                //     }
+                // }
+                // else {
+                    var Latitude = meet.lat;
+                    var Longitude = meet.long;
+                    var label = (i + 1).toString();
+                    myLatLng = { lat: Latitude, lng: Longitude }
+                    const marker = new google.maps.Marker({
+                        position: myLatLng,
+                        map,
+                        title: meet.meetName,
+                        label: label
+                    });
+                    marker.addListener("click", () => {
+                        if (isInfoWindowOpen(infoWindow)) {
+                            infoWindow.close();
+
+                        }
+                        else {
+                            infoWindow.close();
+                            infoWindow.setContent(marker.getTitle());
+                            infoWindow.open(marker.getMap(), marker);
+                            infoWindow.focus(marker)
+                        }
+
+                    });
+                //}
+                
+            }
+        }
     }
 </script>
     <body>

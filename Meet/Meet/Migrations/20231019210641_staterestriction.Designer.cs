@@ -4,6 +4,7 @@ using Meet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Meet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231019210641_staterestriction")]
+    partial class staterestriction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -277,8 +279,8 @@ namespace Meet.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b9863ccd-54e6-4e5e-b190-222e75b980a7",
-                            ConcurrencyStamp = "2e414988-96ab-421b-85ac-457a5e7c4921",
+                            Id = "6fa6d418-6913-4f12-8000-d9a6453dc0c7",
+                            ConcurrencyStamp = "9c129ad4-c6a2-41fe-9623-7427691a9e85",
                             Name = "CarGuy",
                             NormalizedName = "CARGUY"
                         });

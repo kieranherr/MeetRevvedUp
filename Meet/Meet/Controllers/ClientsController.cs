@@ -81,21 +81,15 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City")] Client client)
+        public async Task<IActionResult> Create([Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City,State")] Client client)
         {
             if (ModelState.IsValid)
             {
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 client.IdentityUserId = userId;
+                client.State = client.State.ToUpper();
                 _context.Add(client);
                 await _context.SaveChangesAsync();
-                IdentityUser test = _context.Users.Where(x => x.Id == userId).FirstOrDefault();
-                var help = test.UserName = client.FirstName + " " + client.LastName;
-                test.UserName = help;
-                test.NormalizedUserName = help.ToUpper();
-                _context.Users.Attach(test);   
-                _context.Entry(test).State = EntityState.Modified;
-                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", client.IdentityUserId);
@@ -156,7 +150,7 @@ namespace Meet.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City")] Client client)
+        public async Task<IActionResult> Edit(int id, [Bind("ClientId,FirstName,LastName,PhoneNumber,Age,City,State")] Client client)
         {
             if (id != client.ClientId)
             {
@@ -169,6 +163,7 @@ namespace Meet.Controllers
                 {
                     var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                     client.IdentityUserId = userId;
+                    client.State = client.State.ToUpper();
                     _context.Update(client);
                     await _context.SaveChangesAsync();
                 }
@@ -217,6 +212,14 @@ namespace Meet.Controllers
             _context.Clients.Remove(client);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public  string GetUserNameById(string userName)
+        {
+            var identityUser = _context.Users.Where(x => x.UserName == userName).FirstOrDefault();
+            var client = _context.Clients.Where(x => x.IdentityUserId == identityUser.Id).FirstOrDefault(); 
+
+            return client.FirstName + " " + client.LastName;
         }
        
 

@@ -8,8 +8,15 @@
 }
 
 <h1>RSVP's</h1>
-
-<table class="table">
+<style>
+    .container .jumbotron {
+        border-radius: 6px;
+    }
+</style>
+@if(Model.ElementAt(0).MeetId != 0 && Model.ElementAt(0).ClientId != 0)
+{
+    <div>
+    <table class="table">
     <thead>
         <tr>
             <th>
@@ -60,4 +67,17 @@
         }
     </tbody>
 </table>
-<a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.FirstOrDefault().MeetId" class="btn btn-primary">Back To The Meet</a>
+</div>
+    <a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.ElementAt(0).MeetId" class="btn btn-primary">Back To The Meet</a>
+}
+else
+{
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">RSVP's</h1>
+            <p class="lead">No RSVP's found</p>
+        </div>
+    </div>
+    <a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.ElementAt(0).MeetId" class="btn btn-primary">Back To The Meet</a>
+}
+

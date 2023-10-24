@@ -4,48 +4,38 @@
     ViewData["Title"] = "CommentIndex";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<style>
+    #meetButtons{
+        margin-bottom: 15px;
+    }
+</style>
 <h1>Comments</h1>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CommentorsName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CommentBody)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Date)
-            </th>
-
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CommentorsName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CommentBody)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Date)
-                </td>
-
-                <td>
-
-                    <a type="button" class="btn btn-primary" asp-action="CommentCreate" asp-route-id="@item.MeetId">Create A New Comment!</a>
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-<a type="button" asp-action="Index" asp-controller="CarMeets" class="btn btn-primary">Back To The Meets</a>
-
+<a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.ElementAt(0).MeetId" class="btn btn-primary" id="meetButtons">Back To The Meet</a>
+@if(Model.ElementAt(0).MeetId != 0 && Model.ElementAt(0).CommentId != 0)
+{
+    @foreach(var item in Model)
+    {
+        <div class="card text-center">
+            <div class="card-header">
+                @Html.DisplayFor(modelItem => item.CommentorsName)
+            </div>
+            <div class="card-body">
+                <p class="card-text">@Html.DisplayFor(modelItem => item.CommentBody)</p>
+            </div>
+            <div class="card-footer text-muted">
+                @Html.DisplayFor(modelItem => item.Date)
+            </div>
+        </div>
+    }
+}
+else{
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-4">Comment Section</h1>
+        <p class="lead">No comments have been submitted for this meet yet</p>
+        <p>Want to be the first to comment?</p><a type="button" class="btn btn-primary" asp-action="CommentCreate" asp-route-id="@Model.ElementAt(0).MeetId">Create A New Comment!</a>
+    </div>
+</div>
+<a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.ElementAt(0).MeetId" class="btn btn-primary">Back To The Meet</a>
+}
 

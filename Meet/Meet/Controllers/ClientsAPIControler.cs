@@ -11,6 +11,10 @@ using Meet.Data;
 using Meet.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Meet.ViewModels;
+using Newtonsoft.Json;
+using System.Net.Http;
+using Twilio.Rest.Trunking.V1;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Meet.Controllers
@@ -40,6 +44,40 @@ namespace Meet.Controllers
         {
             var test = await _context.Clients.Where(x => x.IdentityUserId == id).FirstOrDefaultAsync();
             return test;
+        }
+        [HttpGet("getcarmeets")]
+        public async Task<IEnumerable<CarMeetListRecord>> GetCarMeets()
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefault();
+
+            var address = client.City.ToString() + "%20" + client.State.ToString();
+            var httpClient = new HttpClient();
+
+            using HttpResponseMessage response = await httpClient.GetAsync("https://maps.googleapis.com/maps/api/geocode/json?address=" + address + $"&key={Meet.ApiKeys.GoogleApiKey}");
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+            var geocode = JsonConvert.DeserializeObject<GeocodeJson>(responseBody).Results;
+
+            var carMeets = _context.CarMeets;
+            var applicationDbContext = _context.CarMeets.Where(x => x.State == client.State).Select(x => new CarMeetListRecord
+            {
+                MeetDate = x.MeetDate,
+                MeetId = x.MeetId,
+                MeetName = x.MeetName,
+                MeetTime = x.MeetTime,
+                Lat = x.Lat,
+                Long = x.Long,
+                City = x.City,
+                Zip = x.Zip,
+                State = x.State,
+                Street = x.Street,
+                UserLat = geocode[0].geometry.location.lat,
+                UserLong = geocode[0].geometry.location.lng,
+            });
+            var result = await applicationDbContext.ToListAsync();
+
+            return result;
         }
 
         // POST api/<ValuesController>
