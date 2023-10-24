@@ -96,7 +96,7 @@ namespace Meet.Controllers
         public IActionResult RSVPIndex(int id)
         {
 
-            var rsvps = _context.ClientMeets.Where(c => c.MeetId == id);
+            var rsvps = _context.ClientMeets.Where(c => c.MeetId == id).ToList();
             if (rsvps == null)
             {
                 return RedirectToAction("Index");
