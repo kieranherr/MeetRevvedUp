@@ -87,6 +87,7 @@ namespace Meet.Controllers
             {
                 var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                 client.IdentityUserId = userId;
+                client.State = client.State.ToUpper();
                 _context.Add(client);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -162,6 +163,7 @@ namespace Meet.Controllers
                 {
                     var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
                     client.IdentityUserId = userId;
+                    client.State = client.State.ToUpper();
                     _context.Update(client);
                     await _context.SaveChangesAsync();
                 }

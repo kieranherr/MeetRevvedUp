@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 namespace Meet.Controllers
 {
     [Authorize(Roles = "CarGuy")]
+
     public class CarMeetsController : Controller
     {
         private readonly ApplicationDbContext _context;
