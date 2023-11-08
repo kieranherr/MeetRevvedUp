@@ -38,7 +38,7 @@ namespace Meet
             else
             {
                 services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("MeetRevvedUpProd")));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             }       
             services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedEmail = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI().AddDefaultTokenProviders();

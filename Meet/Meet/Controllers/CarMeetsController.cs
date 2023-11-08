@@ -52,10 +52,10 @@ namespace Meet.Controllers
                 return RedirectToAction("Create");
             }
             var applicationDbContext = _context.CarMeets.Where(x => x.State == client.State).Select(x => new CarMeetListRecord{
-                MeetDate = x.MeetDate,
+                MeetDate = x.MeetDate.DateTime.ToShortDateString(),
                 MeetId = x.MeetId,
                 MeetName = x.MeetName,
-                MeetTime = x.MeetTime,
+                MeetTime = x.MeetTime.DateTime.ToShortTimeString(),
                 Lat = x.Lat, 
                 Long = x.Long,
                 City = x.City,
@@ -65,8 +65,7 @@ namespace Meet.Controllers
                 UserLat = geocode[0].geometry.location.lat,
                 UserLong = geocode[0].geometry.location.lng,
             });
-            var result = await applicationDbContext.ToListAsync();
-
+            var result = await applicationDbContext.ToListAsync(); 
             return View(result);
         }
 
@@ -133,11 +132,34 @@ namespace Meet.Controllers
         }
         public async Task<IActionResult> CommentIndex(int id)
         {
-            var comments = await _context.Comments.Where(c => c.MeetId == id).ToListAsync();
-            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefaultAsync();
-            if (comments.Count() == 0)
+            var exisitingComments = await _context.Comments.Where(c => c.MeetId == id).Select(x => new CommentDetail
             {
-                comments.Add(new Comment() { MeetId = id });
+                CommentBody = x.CommentBody,
+                CommentId = x.CommentId,
+                CommentorsName = x.CommentorsName,
+                Date = x.Date,
+                IsOwner = false,
+                MeetId = x.MeetId
+            }).ToListAsync();
+            var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).FirstOrDefaultAsync();
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var client = await _context.Clients.Where(c => c.IdentityUserId == userId).FirstOrDefaultAsync();
+            var clientName = (client.FirstName + " " + client.LastName).ToLower();
+            List<CommentDetail> comments = new List<CommentDetail>();
+            if (exisitingComments.Count() == 0)
+            {
+                comments.Add(new CommentDetail() { MeetId = id });
+            }
+            else
+            {
+                foreach(var item in exisitingComments)
+                {
+                    if (item.CommentorsName.ToLower() == clientName)
+                    {
+                        item.IsOwner = true;
+                    }
+                    comments.Add(item);
+                }
             }
             return View( comments);
         }
@@ -173,7 +195,7 @@ namespace Meet.Controllers
                 comment.Date = DateTime.Now.ToString("M/d/yyyy");
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("CommentIndex", new {id = comment.MeetId});
             }
             return View(comment);
         }
@@ -189,10 +211,10 @@ namespace Meet.Controllers
             }
             var carMeet = await _context.CarMeets.Where(x => x.MeetId == id).Select(x => new CarMeetDetails
             {
-                MeetDate = x.MeetDate,
+                MeetDate = x.MeetDate.DateTime.ToShortDateString(),
                 MeetId = x.MeetId,
                 MeetName = x.MeetName,
-                MeetTime = x.MeetTime,
+                MeetTime = x.MeetTime.DateTime.ToShortTimeString(),
                 City = x.City,
                 CurrentUserId = currentUser.ClientId,
                 State = x.State,
@@ -367,10 +389,10 @@ namespace Meet.Controllers
         {
             var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).Select(x => new CarMeetDetails
             {
-                MeetDate = x.MeetDate,
+                MeetDate = x.MeetDate.DateTime.ToShortDateString(),
                 MeetId = x.MeetId,
                 MeetName = x.MeetName,
-                MeetTime = x.MeetTime,
+                MeetTime = x.MeetTime.DateTime.ToShortTimeString(),
                 City = x.City,
                 State = x.State,
                 Street = x.Street,
@@ -396,10 +418,10 @@ namespace Meet.Controllers
         {
             var carMeet = await _context.CarMeets.Where(c => c.MeetId == id).Select(x => new CarMeetDetails
             {
-                MeetDate = x.MeetDate,
+                MeetDate = x.MeetDate.DateTime.ToShortDateString(),
                 MeetId = x.MeetId,
                 MeetName = x.MeetName,
-                MeetTime = x.MeetTime,
+                MeetTime = x.MeetTime.DateTime.ToShortTimeString(),
                 City = x.City,
                 State = x.State,
                 Street = x.Street,

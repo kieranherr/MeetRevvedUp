@@ -22,9 +22,9 @@ namespace Meet.Models
         public string State { get; set; }
         public long Zip { get; set; }
         [Display(Name = "Meet Time")]
-        public string MeetTime { get; set; }
+        public DateTimeOffset MeetTime { get; set; }
         [Display(Name = "Meet Date")]
-        public string MeetDate { get; set; }
+        public DateTimeOffset MeetDate { get; set; }
 
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }

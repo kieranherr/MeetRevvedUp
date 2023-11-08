@@ -62,10 +62,10 @@ namespace Meet.Controllers
             var carMeets = _context.CarMeets;
             var applicationDbContext = _context.CarMeets.Where(x => x.State == client.State).Select(x => new CarMeetListRecord
             {
-                MeetDate = x.MeetDate,
+                MeetDate = x.MeetDate.DateTime.ToShortDateString(),
                 MeetId = x.MeetId,
                 MeetName = x.MeetName,
-                MeetTime = x.MeetTime,
+                MeetTime = x.MeetTime.DateTime.ToShortTimeString(),
                 Lat = x.Lat,
                 Long = x.Long,
                 City = x.City,

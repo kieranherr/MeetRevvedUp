@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Meet.Models.Comment>
+﻿@model IEnumerable<Meet.ViewModels.CommentDetail>
 
 @{
     ViewData["Title"] = "CommentIndex";
@@ -8,6 +8,14 @@
     #meetButtons{
         margin-bottom: 15px;
     }
+
+    #alert {
+        background-color: red;
+        border-color: red;
+    }
+    #commentCard{
+        margin-bottom: 10px;
+    }
 </style>
 <h1>Comments</h1>
 <a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.ElementAt(0).MeetId" class="btn btn-primary" id="meetButtons">Back To The Meet</a>
@@ -15,9 +23,15 @@
 {
     @foreach(var item in Model)
     {
-        <div class="card text-center">
-            <div class="card-header">
+        <div class="card text-center" id="commentCard">
+            <div class="card-header text-center">
                 @Html.DisplayFor(modelItem => item.CommentorsName)
+                <div class="text-center">
+                    @if (item.IsOwner)
+                    {
+                        <a type="button" class="btn btn-danger text-center btn-sm btn-block">Delete Placeholder</a>
+                    }
+                </div>
             </div>
             <div class="card-body">
                 <p class="card-text">@Html.DisplayFor(modelItem => item.CommentBody)</p>
@@ -27,6 +41,7 @@
             </div>
         </div>
     }
+    <a type="button" class="btn btn-primary" asp-action="CommentCreate" asp-route-id="@Model.ElementAt(0).MeetId">Create A New Comment!</a>
 }
 else{
 <div class="jumbotron jumbotron-fluid">
@@ -36,6 +51,5 @@ else{
         <p>Want to be the first to comment?</p><a type="button" class="btn btn-primary" asp-action="CommentCreate" asp-route-id="@Model.ElementAt(0).MeetId">Create A New Comment!</a>
     </div>
 </div>
-<a type="button" asp-controller="CarMeets" asp-action="Details" asp-route-id="@Model.ElementAt(0).MeetId" class="btn btn-primary">Back To The Meet</a>
 }
 
